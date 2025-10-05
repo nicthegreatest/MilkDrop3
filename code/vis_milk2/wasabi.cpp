@@ -1,24 +1,29 @@
 #include "wasabi.h"
-#include <Windows.h>
+#include <stdio.h>
 
-extern HINSTANCE api_orig_hinstance;
+// Stub implementation for wasabi API functions.
+// These functions will need to be replaced with a proper cross-platform implementation.
 
-static wchar_t buffer[4096];
-
-wchar_t* wasabiApiLangString(int id, wchar_t* buffer, int len) {
-    LoadStringW(api_orig_hinstance, id, buffer, len);
-    return (wchar_t*) buffer;
+const char* wasabiApiLangString(int id, char* buffer, int len) {
+    if (buffer != NULL && len > 0) {
+        snprintf(buffer, len, "LangString %d", id);
+        return buffer;
+    }
+    return "Error: Invalid buffer";
 }
 
-wchar_t* wasabiApiLangString(int id) {
-    LoadStringW(api_orig_hinstance, id, buffer, 4096);
-    return (wchar_t*) buffer;
+const char* wasabiApiLangString(int id) {
+    static char buffer[1024];
+    snprintf(buffer, sizeof(buffer), "LangString %d", id);
+    return buffer;
 }
 
-HWND wasabiApiCreateDialogParam(int templateName, HWND parent, DLGPROC proc, LPARAM initParam) {
-    return CreateDialogParamW(api_orig_hinstance, wasabiApiLangString(templateName), parent, proc, initParam);
+HMENU wasabiApiLoadMenu(int id) {
+    // Return a dummy value.
+    return (HMENU)1;
 }
 
-HMENU wasabiApiLoadMenu(int menuId) {
-    return LoadMenuW(api_orig_hinstance, MAKEINTRESOURCEW(menuId));
+HWND wasabiApiCreateDialogParam(int templateName, HWND parent, DLGPROC proc, long initParam) {
+    // Return a dummy value.
+    return (HWND)1;
 }

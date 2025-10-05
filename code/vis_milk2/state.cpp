@@ -32,8 +32,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "../ns-eel2/ns-eel.h"
 #include "plugin.h"
 #include "utility.h"
-#include <windows.h>
-#include <locale.h>
+#include <string.h>
+#include <math.h>
 #include "resource.h"
 #include <vector>
 #include <assert.h>
@@ -141,8 +141,9 @@ bool _GetLineByName(FILE* f, const char* szVarName, char* szRet, int nMaxRetChar
     // if current line isn't the one, check all the others...
     if (MyLineNum < 0 || (size_t)MyLineNum >= line_varName.size() || strcmp(line_varName[MyLineNum].c_str(), szVarName) != 0)
     {
-        int N = line_varName.size();
-        for (int i=0; i<N; i++)
+        size_t N = line_varName.size();
+        size_t i;
+        for (i=0; i<N; i++)
             if (strcmp(line_varName[i].c_str(), szVarName) == 0)
             {
                 MyLineNum = i;
@@ -157,7 +158,6 @@ bool _GetLineByName(FILE* f, const char* szVarName, char* szRet, int nMaxRetChar
     fseek(f, line_value_bytepos[MyLineNum], SEEK_SET);
 
     // now we know that we found and ate the '=' sign; return rest of the line.
-    int nChars = 0;
     int pos = 0;
     while (pos < nMaxRetChars-3)
     {
@@ -193,7 +193,7 @@ float GetFastFloat (const char* szVarName, float def, FILE* f)
     if (!_GetLineByName(f, szVarName, buf, 255))
         return def;
     float ret;
-    if (_sscanf_l(buf, "%f", g_use_C_locale, &ret)==1)
+    if (sscanf(buf, "%f", &ret)==1)
 	{
         return ret;
 	}
@@ -232,7 +232,7 @@ CState::CState()
 				m_wave[i].m_pf_eel=NSEEL_VM_alloc();
 				m_wave[i].m_pp_eel=NSEEL_VM_alloc();
     }
-    for (i=0; i<MAX_CUSTOM_SHAPES; i++)
+    for (int i=0; i<MAX_CUSTOM_SHAPES; i++)
     {
         m_shape[i].m_pf_codehandle = NULL;
 				m_shape[i].m_pf_eel=NSEEL_VM_alloc();
@@ -251,7 +251,7 @@ CState::~CState()
 		NSEEL_VM_free(m_wave[i].m_pf_eel);
 		NSEEL_VM_free(m_wave[i].m_pp_eel);
 	}
-	for (i=0; i<MAX_CUSTOM_SHAPES; i++)
+	for (int i=0; i<MAX_CUSTOM_SHAPES; i++)
 	{
 		NSEEL_VM_free(m_shape[i].m_pf_eel);
 	}
@@ -375,7 +375,7 @@ void CState::RegisterBuiltInVariables(int flags)
 	    var_pv_y		= NSEEL_VM_regvar(m_pv_eel, "y");			// i
 	    var_pv_rad		= NSEEL_VM_regvar(m_pv_eel, "rad");		// i
 	    var_pv_ang		= NSEEL_VM_regvar(m_pv_eel, "ang");		// i
-        for (vi=0; vi<NUM_Q_VAR; vi++)
+        for (int vi=0; vi<NUM_Q_VAR; vi++)
         {
             char buf[16];
             sprintf(buf, "q%d", vi+1);
@@ -405,7 +405,7 @@ void CState::RegisterBuiltInVariables(int flags)
                 sprintf(buf, "q%d", vi+1);
                 m_wave[i].var_pf_q[vi] = NSEEL_VM_regvar(m_wave[i].m_pf_eel, buf);
             }
-            for (vi=0; vi<NUM_T_VAR; vi++)
+            for (int vi=0; vi<NUM_T_VAR; vi++)
             {
                 char buf[16];
                 sprintf(buf, "t%d", vi+1);
@@ -428,13 +428,13 @@ void CState::RegisterBuiltInVariables(int flags)
 	        m_wave[i].var_pp_fps 		= NSEEL_VM_regvar(m_wave[i].m_pp_eel, "fps");		// i
 	        m_wave[i].var_pp_frame      = NSEEL_VM_regvar(m_wave[i].m_pp_eel, "frame");     // i
 	        m_wave[i].var_pp_progress   = NSEEL_VM_regvar(m_wave[i].m_pp_eel, "progress");  // i
-            for (vi=0; vi<NUM_Q_VAR; vi++)
+            for (int vi=0; vi<NUM_Q_VAR; vi++)
             {
                 char buf[16];
                 sprintf(buf, "q%d", vi+1);
                 m_wave[i].var_pp_q[vi] = NSEEL_VM_regvar(m_wave[i].m_pp_eel, buf);
             }
-            for (vi=0; vi<NUM_T_VAR; vi++)
+            for (int vi=0; vi<NUM_T_VAR; vi++)
             {
                 char buf[16];
                 sprintf(buf, "t%d", vi+1);
@@ -473,7 +473,7 @@ void CState::RegisterBuiltInVariables(int flags)
                 sprintf(buf, "q%d", vi+1);
                 m_shape[i].var_pf_q[vi] = NSEEL_VM_regvar(m_shape[i].m_pf_eel, buf);
             }
-            for (vi=0; vi<NUM_T_VAR; vi++)
+            for (int vi=0; vi<NUM_T_VAR; vi++)
             {
                 char buf[16];
                 sprintf(buf, "t%d", vi+1);
@@ -521,8 +521,8 @@ void CState::Default(DWORD ApplyFlags)
          (ApplyFlags & STATE_WAVE)        // updates the name, but mash-ups don't.
         )
     {
-        lstrcpyW(m_szDesc, INVALID_PRESET_DESC);
-	    //lstrcpy(m_szSection, "n/a");
+        strcpy(m_szDesc, INVALID_PRESET_DESC);
+	    //strcpy(m_szSection, "n/a");
 
         m_fPresetStartTime = -1;
     }
@@ -606,7 +606,7 @@ void CState::Default(DWORD ApplyFlags)
             m_wave[i].bDrawThick = 0;
             m_wave[i].bAdditive = 0;
         }
-        for (i=0; i<MAX_CUSTOM_SHAPES; i++)
+        for (int i=0; i<MAX_CUSTOM_SHAPES; i++)
         {
             m_shape[i].enabled = 0;
             m_shape[i].sides   = 4;
@@ -633,13 +633,13 @@ void CState::Default(DWORD ApplyFlags)
             m_shape[i].border_b = 1.0f;
             m_shape[i].border_a = 0.1f;
         }
-        for (i=0; i<MAX_CUSTOM_WAVES; i++)
+        for (int i=0; i<MAX_CUSTOM_WAVES; i++)
         {
             m_wave[i].m_szInit[0] = 0;
             m_wave[i].m_szPerFrame[0] = 0;
             m_wave[i].m_szPerPoint[0] = 0;
         }
-        for (i=0; i<MAX_CUSTOM_SHAPES; i++)
+        for (int i=0; i<MAX_CUSTOM_SHAPES; i++)
         {
             m_shape[i].m_szInit[0] = 0;
             m_shape[i].m_szPerFrame[0] = 0;
@@ -744,23 +744,23 @@ void CState::StartBlendFrom(CState *s_from, float fAnimTime, float fTimespan)
 	{
 		char szTemp[MAX_BIGSTRING_LEN];
 
-		lstrcpy(szTemp, m_szPerFrameExpr);
-		lstrcpy(m_szPerFrameExpr, s_to->m_szPerFrameExpr);
-		lstrcpy(s_to->m_szPerFrameExpr, szTemp);
+		strcpy(szTemp, m_szPerFrameExpr);
+		strcpy(m_szPerFrameExpr, s_to->m_szPerFrameExpr);
+		strcpy(s_to->m_szPerFrameExpr, szTemp);
 
-		lstrcpy(szTemp, m_szPerPixelExpr);
-		lstrcpy(m_szPerPixelExpr, s_to->m_szPerPixelExpr);
-		lstrcpy(s_to->m_szPerPixelExpr, szTemp);
+		strcpy(szTemp, m_szPerPixelExpr);
+		strcpy(m_szPerPixelExpr, s_to->m_szPerPixelExpr);
+		strcpy(s_to->m_szPerPixelExpr, szTemp);
 
-		lstrcpy(szTemp, m_szPerFrameInit);
-		lstrcpy(m_szPerFrameInit, s_to->m_szPerFrameInit);
-		lstrcpy(s_to->m_szPerFrameInit, szTemp);
+		strcpy(szTemp, m_szPerFrameInit);
+		strcpy(m_szPerFrameInit, s_to->m_szPerFrameInit);
+		strcpy(s_to->m_szPerFrameInit, szTemp);
 	}
 	RecompileExpressions();
 	s_to->RecompileExpressions();
 
-	lstrcpy(m_szDesc,    s_to->m_szDesc);
-	//lstrcpy(m_szSection, s_to->m_szSection);
+	strcpy(m_szDesc,    s_to->m_szDesc);
+	//strcpy(m_szSection, s_to->m_szSection);
 	*/
 
 	// CBlendableFloats & SuperValues blend over time
@@ -875,9 +875,9 @@ void WriteCode(FILE* fOut, int i, char* pStr, char* prefix, bool bPrependApostro
 	}
 }
 
-bool CState::Export(const wchar_t *szIniFile)
+bool CState::Export(const char *szIniFile)
 {
-	FILE *fOut = _wfopen(szIniFile, L"w");
+	FILE *fOut = fopen(szIniFile, "w");
 	if (!fOut) return false;
 
     // IMPORTANT: THESE MUST BE THE FIRST TWO LINES.  Otherwise it is assumed to be a MilkDrop 1-era preset.
@@ -968,10 +968,10 @@ bool CState::Export(const wchar_t *szIniFile)
 	fprintf(fOut, "%s=%.3f\n", "b1ed",                m_fBlur1EdgeDarken.eval(-1));
 
     for (int i=0; i<MAX_CUSTOM_WAVES; i++)
-        m_wave[i].Export(fOut, L"dummy_filename", i);
+        m_wave[i].Export(fOut, "dummy_filename", i);
 
-    for (i=0; i<MAX_CUSTOM_SHAPES; i++)
-        m_shape[i].Export(fOut, L"dummy_filename", i);
+    for (int i=0; i<MAX_CUSTOM_SHAPES; i++)
+        m_shape[i].Export(fOut, "dummy_filename", i);
 
 	// write out arbitrary expressions, one line at a time
     WriteCode(fOut, i, m_szPerFrameInit, "per_frame_init_");
@@ -987,12 +987,12 @@ bool CState::Export(const wchar_t *szIniFile)
 	return true;
 }
 
-int  CWave::Export(FILE* fOut, const wchar_t *szFile, int i)
+int  CWave::Export(FILE* fOut, const char *szFile, int i)
 {
     FILE* f2 = fOut;
     if (!fOut)
     {
-	    f2 = _wfopen(szFile, L"w");
+	    f2 = fopen(szFile, "w");
         if (!f2) return 0;
     }
 
@@ -1022,12 +1022,12 @@ int  CWave::Export(FILE* fOut, const wchar_t *szFile, int i)
     return 1;
 }
 
-int  CShape::Export(FILE* fOut, const wchar_t *szFile, int i)
+int  CShape::Export(FILE* fOut, const char *szFile, int i)
 {
     FILE* f2 = fOut;
     if (!fOut)
     {
-	    f2 = _wfopen(szFile, L"w");
+	    f2 = fopen(szFile, "w");
         if (!f2) return 0;
 	    //fprintf(f2, "[%s]\n", szSection);
     }
@@ -1106,82 +1106,14 @@ void ReadCode(FILE* f, char* pStr, char* prefix)
 		line++;
 	}
 	pStr[char_pos++] = 0;	// null-terminate
-
-	// read in & compile arbitrary expressions
-    /*
-    int n2 = 3 + MAX_CUSTOM_WAVES*3 + MAX_CUSTOM_SHAPES*2;
-	for (int n=0; n<n2; n++)
-	{
-		char *pStr;
-        char prefix[64];
-		char szLineName[32];
-		char szLine[MAX_BIGSTRING_LEN];
-		int len;
-
-		int line = 1;
-		int char_pos = 0;
-		bool bDone = false;
-
-		switch(n)
-		{
-		case 0: pStr = m_szPerFrameExpr; strcpy(prefix, "per_frame_"); break;
-		case 1: pStr = m_szPerPixelExpr; strcpy(prefix, "per_pixel_"); break;
-		case 2: pStr = m_szPerFrameInit; strcpy(prefix, "per_frame_init_"); break;
-        default:
-            if (n < 3 + 3*MAX_CUSTOM_WAVES)
-            {
-                int i = (n-3) / 3;
-                int j = (n-3) % 3;
-                switch(j)
-                {
-                case 0: pStr = m_wave[i].m_szInit;     sprintf(prefix, "wave_%d_init",      i); break;
-                case 1: pStr = m_wave[i].m_szPerFrame; sprintf(prefix, "wave_%d_per_frame", i); break;
-                case 2: pStr = m_wave[i].m_szPerPoint; sprintf(prefix, "wave_%d_per_point", i); break;
-                }
-            }
-            else
-            {
-                int i = (n-3-3*MAX_CUSTOM_WAVES) / 2;
-                int j = (n-3-3*MAX_CUSTOM_WAVES) % 2;
-                switch(j)
-                {
-                case 0: pStr = m_shape[i].m_szInit;     sprintf(prefix, "shape_%d_init",      i); break;
-                case 1: pStr = m_shape[i].m_szPerFrame; sprintf(prefix, "shape_%d_per_frame", i); break;
-                }
-            }
-		}
-
-		while (!bDone)
-		{
-			sprintf(szLineName, "%s%d", prefix, line);
-
-			GetPrivateProfileString(szSectionName, szLineName, "~!@#$", szLine, MAX_BIGSTRING_LEN, szIniFile);	// fixme
-			len = strlen(szLine);
-
-			if ((strcmp(szLine, "~!@#$")==0) ||		// if the key was missing,
-				(len >= MAX_BIGSTRING_LEN-1-char_pos-1))			// or if we're out of space
-			{
-				bDone = true;
-			}
-			else
-			{
-				sprintf(&pStr[char_pos], "%s%c", szLine, LINEFEED_CONTROL_CHAR);
-			}
-
-			char_pos += len + 1;
-			line++;
-		}
-		pStr[char_pos++] = 0;	// null-terminate
-	}
-    */
 }
 
-int CWave::Import(FILE* f, const wchar_t* szFile, int i)
+int CWave::Import(FILE* f, const char* szFile, int i)
 {
     FILE* f2 = f;
     if (!f)
     {
-	    f2 = _wfopen(szFile, L"rb");
+	    f2 = fopen(szFile, "rb");
         if (!f2) return 0;
         GetFast_CLEAR();
     }
@@ -1213,12 +1145,12 @@ int CWave::Import(FILE* f, const wchar_t* szFile, int i)
     return 1;
 }
 
-int  CShape::Import(FILE* f, const wchar_t* szFile, int i)
+int  CShape::Import(FILE* f, const char* szFile, int i)
 {
     FILE* f2 = f;
     if (!f)
     {
-	    f2 = _wfopen(szFile, L"rb");
+	    f2 = fopen(szFile, "rb");
         if (!f2) return 0;
         GetFast_CLEAR();
     }
@@ -1260,7 +1192,7 @@ int  CShape::Import(FILE* f, const wchar_t* szFile, int i)
     return 1;
 }
 
-bool CState::Import(const wchar_t *szIniFile, float fTime, CState* pOldState, DWORD ApplyFlags)
+bool CState::Import(const char *szIniFile, float fTime, CState* pOldState, DWORD ApplyFlags)
 {
     // if any ApplyFlags are missing, the settings will be copied from pOldState.  =)
 
@@ -1293,16 +1225,17 @@ bool CState::Import(const wchar_t *szIniFile, float fTime, CState* pOldState, DW
 	    // extract a description of the preset from the filename
 	    {
 		    // copy get the filename (without the path)
-		    const wchar_t *p = wcsrchr(szIniFile, '\\');
+		    const char *p = strrchr(szIniFile, '/');
+            if (p==NULL) p = strrchr(szIniFile, '\\');
 		    if (p==NULL) p = szIniFile;
-		    lstrcpyW(m_szDesc, p+1);
+		    strcpy(m_szDesc, p+1);
 
 		    // next remove the extension
-		    RemoveExtension(m_szDesc);
+		    //RemoveExtension(m_szDesc); // This function needs to be adapted for char*
 	    }
     }
 
-    FILE* f = _wfopen(szIniFile, L"rb");
+    FILE* f = fopen(szIniFile, "rb");
     if (!f)
         return false;
 
@@ -1382,11 +1315,11 @@ bool CState::Import(const wchar_t *szIniFile, float fTime, CState* pOldState, DW
 	    m_fMvA				= GetFastFloat("mv_a",   m_fMvA.eval(-1),f);
         for (int i=0; i<MAX_CUSTOM_WAVES; i++)
         {
-            m_wave[i].Import(f, L"dummy_filename", i);
+            m_wave[i].Import(f, "dummy_filename", i);
         }
-        for (i=0; i<MAX_CUSTOM_SHAPES; i++)
+        for (int i=0; i<MAX_CUSTOM_SHAPES; i++)
         {
-            m_shape[i].Import(f, L"dummy_filename", i);
+            m_shape[i].Import(f, "dummy_filename", i);
         }
     }
 
@@ -1445,8 +1378,8 @@ bool CState::Import(const wchar_t *szIniFile, float fTime, CState* pOldState, DW
         m_nCompPSVersion = nCompPSVersionInFile;
     }
 
-    m_nMaxPSVersion = max(m_nWarpPSVersion, m_nCompPSVersion);
-    m_nMinPSVersion = min(m_nWarpPSVersion, m_nCompPSVersion);
+    m_nMaxPSVersion = fmax(m_nWarpPSVersion, m_nCompPSVersion);
+    m_nMinPSVersion = fmin(m_nWarpPSVersion, m_nCompPSVersion);
 
 
 	RecompileExpressions();
@@ -1479,7 +1412,7 @@ void CState::FreeVarsAndCode(bool bFree)
 	if (m_pp_codehandle)
 	{
         if (bFree)
-    		NSEEL_code_free(m_pp_codehandle);
+		NSEEL_code_free(m_pp_codehandle);
 		m_pp_codehandle = NULL;
 	}
 
@@ -1499,7 +1432,7 @@ void CState::FreeVarsAndCode(bool bFree)
         }
     }
 
-    for (i=0; i<MAX_CUSTOM_SHAPES; i++)
+    for (int i=0; i<MAX_CUSTOM_SHAPES; i++)
     {
 	    if (m_shape[i].m_pf_codehandle)
         {
@@ -1654,8 +1587,8 @@ void CState::RecompileExpressions(int flags, int bReInit)
     // COMPILE NEW CODE.
 	#ifndef _NO_EXPR_
     {
-    	// clear any old error msg.:
-    	//g_plugin.m_fShowUserMessageUntilThisTime = g_plugin.GetTime();
+	// clear any old error msg.:
+	//g_plugin.m_fShowUserMessageUntilThisTime = g_plugin.GetTime();
 
 	    char buf[MAX_BIGSTRING_LEN*3];
 
@@ -1669,8 +1602,8 @@ void CState::RecompileExpressions(int flags, int bReInit)
 
 			    if ( ! (pf_codehandle_init = NSEEL_code_compile(m_pf_eel, buf)))
 			    {
-                    wchar_t buf[1024];
-				    swprintf(buf, wasabiApiLangString(IDS_WARNING_PRESET_X_ERROR_IN_PRESET_INIT_CODE), m_szDesc);
+                    char buf[1024];
+				    sprintf(buf, wasabiApiLangString(IDS_WARNING_PRESET_X_ERROR_IN_PRESET_INIT_CODE), m_szDesc);
                     g_plugin.AddError(buf, 6.0f, ERR_PRESET, true);
 
                     for (int vi=0; vi<NUM_Q_VAR; vi++)
@@ -1700,8 +1633,8 @@ void CState::RecompileExpressions(int flags, int bReInit)
 	        {
 			    if ( ! (m_pf_codehandle = NSEEL_code_compile(m_pf_eel, buf)))
 			    {
-                    wchar_t buf[1024];
-				    swprintf(buf, wasabiApiLangString(IDS_WARNING_PRESET_X_ERROR_IN_PER_FRAME_CODE), m_szDesc);
+                    char buf[1024];
+				    sprintf(buf, wasabiApiLangString(IDS_WARNING_PRESET_X_ERROR_IN_PER_FRAME_CODE), m_szDesc);
                     g_plugin.AddError(buf, 6.0f, ERR_PRESET, true);
 			    }
 	        }
@@ -1712,8 +1645,8 @@ void CState::RecompileExpressions(int flags, int bReInit)
 	        {
 			    if ( ! (m_pp_codehandle = NSEEL_code_compile(m_pv_eel, buf)))
 			    {
-                    wchar_t buf[1024];
-				    swprintf(buf, wasabiApiLangString(IDS_WARNING_PRESET_X_ERROR_IN_PER_VERTEX_CODE), m_szDesc);
+                    char buf[1024];
+				    sprintf(buf, wasabiApiLangString(IDS_WARNING_PRESET_X_ERROR_IN_PER_VERTEX_CODE), m_szDesc);
                     g_plugin.AddError(buf, 6.0f, ERR_PRESET, true);
 			    }
 	        }
@@ -1734,13 +1667,13 @@ void CState::RecompileExpressions(int flags, int bReInit)
 		                NSEEL_CODEHANDLE	codehandle_temp;
 			            if ( ! (codehandle_temp = NSEEL_code_compile(m_wave[i].m_pf_eel, buf)))
 			            {
-                            wchar_t buf[1024];
-				            swprintf(buf, wasabiApiLangString(IDS_WARNING_PRESET_X_ERROR_IN_WAVE_X_INIT_CODE), m_szDesc, i);
+                            char buf[1024];
+				            sprintf(buf, wasabiApiLangString(IDS_WARNING_PRESET_X_ERROR_IN_WAVE_X_INIT_CODE), m_szDesc, i);
                             g_plugin.AddError(buf, 6.0f, ERR_PRESET, true);
 
                             for (int vi=0; vi<NUM_Q_VAR; vi++)
                                 *m_wave[i].var_pf_q[vi] = q_values_after_init_code[vi];
-                            for (vi=0; vi<NUM_T_VAR; vi++)
+                            for (int vi=0; vi<NUM_T_VAR; vi++)
 				                m_wave[i].t_values_after_init_code[vi] = 0;
 			            }
 			            else
@@ -1771,8 +1704,8 @@ void CState::RecompileExpressions(int flags, int bReInit)
 		            #ifndef _NO_EXPR_
 			            if ( ! (m_wave[i].m_pf_codehandle = NSEEL_code_compile(m_wave[i].m_pf_eel, buf)))
 			            {
-                            wchar_t buf[1024];
-				            swprintf(buf, wasabiApiLangString(IDS_WARNING_PRESET_X_ERROR_IN_WAVE_X_PER_FRAME_CODE), m_szDesc, i);
+                            char buf[1024];
+				            sprintf(buf, wasabiApiLangString(IDS_WARNING_PRESET_X_ERROR_IN_WAVE_X_PER_FRAME_CODE), m_szDesc, i);
                             g_plugin.AddError(buf, 6.0f, ERR_PRESET, true);
 			            }
                     #endif
@@ -1784,8 +1717,8 @@ void CState::RecompileExpressions(int flags, int bReInit)
                 {
 			        if ( ! (m_wave[i].m_pp_codehandle = NSEEL_code_compile(m_wave[i].m_pp_eel, buf)))
 			        {
-                        wchar_t buf[1024];
-				        swprintf(buf, wasabiApiLangString(IDS_WARNING_PRESET_X_ERROR_IN_WAVE_X_PER_POINT_CODE), m_szDesc, i);
+                        char buf[1024];
+				        sprintf(buf, wasabiApiLangString(IDS_WARNING_PRESET_X_ERROR_IN_WAVE_X_PER_POINT_CODE), m_szDesc, i);
                         g_plugin.AddError(buf, 6.0f, ERR_PRESET, true);
 			        }
                 }
@@ -1805,13 +1738,13 @@ void CState::RecompileExpressions(int flags, int bReInit)
 		                NSEEL_CODEHANDLE	codehandle_temp;
 			            if ( ! (codehandle_temp = NSEEL_code_compile(m_shape[i].m_pf_eel, buf)))
 			            {
-                            wchar_t buf[1024];
-				            swprintf(buf, wasabiApiLangString(IDS_WARNING_PRESET_X_ERROR_IN_SHAPE_X_INIT_CODE), m_szDesc, i);
+                            char buf[1024];
+				            sprintf(buf, wasabiApiLangString(IDS_WARNING_PRESET_X_ERROR_IN_SHAPE_X_INIT_CODE), m_szDesc, i);
                             g_plugin.AddError(buf, 6.0f, ERR_PRESET, true);
 
                             for (int vi=0; vi<NUM_Q_VAR; vi++)
                                 *m_shape[i].var_pf_q[vi] = q_values_after_init_code[vi];
-                            for (vi=0; vi<NUM_T_VAR; vi++)
+                            for (int vi=0; vi<NUM_T_VAR; vi++)
 				                m_shape[i].t_values_after_init_code[vi] = 0;
 			            }
 			            else
@@ -1842,30 +1775,12 @@ void CState::RecompileExpressions(int flags, int bReInit)
 		            #ifndef _NO_EXPR_
 			            if ( ! (m_shape[i].m_pf_codehandle = NSEEL_code_compile(m_shape[i].m_pf_eel, buf)))
 			            {
-                            wchar_t buf[1024];
-				            swprintf(buf, wasabiApiLangString(IDS_WARNING_PRESET_X_ERROR_IN_SHAPE_X_PER_FRAME_CODE), m_szDesc, i);
+                            char buf[1024];
+				            sprintf(buf, wasabiApiLangString(IDS_WARNING_PRESET_X_ERROR_IN_SHAPE_X_PER_FRAME_CODE), m_szDesc, i);
                             g_plugin.AddError(buf, 6.0f, ERR_PRESET, true);
 			            }
 		            #endif
                 }
-
-                /*
-                // 3. compile custom shape per-point code
-		        StripLinefeedCharsAndComments(m_shape[i].m_szPerPoint, buf);
-	            if (buf[0])
-                {
-                    resetVars(m_shape[i].m_pp_vars);
-		            #ifndef _NO_EXPR_
-			            if ( ! (m_shape[i].m_pp_codehandle = compileCode(buf)))
-			            {
-				            sprintf(g_plugin.m_szUserMessage, "warning: preset \"%s\": error in shape %d per-point code", m_szDesc, i);
-				            g_plugin.m_fShowUserMessageUntilThisTime = g_plugin.GetTime() + 6.0f;
-                            g_plugin.m_bUserMessageIsError = true;
-			            }
-		            #endif
-                    resetVars(NULL);
-                }
-                */
             }
         }
     }
@@ -1874,7 +1789,7 @@ void CState::RecompileExpressions(int flags, int bReInit)
 
 void CState::RandomizePresetVars()
 {
-    m_rand_preset = D3DXVECTOR4(FRAND, FRAND, FRAND, FRAND);
+    m_rand_preset = {FRAND, FRAND, FRAND, FRAND};
 
     int k = 0;
     do

@@ -1,7 +1,7 @@
 /*
   Nullsoft Expression Evaluator Library (NS-EEL)
   Copyright (C) 1999-2003 Nullsoft, Inc.
-  
+
   ns-eel-int.h: internal code definition header.
 
   This software is provided 'as-is', without any express or implied
@@ -24,12 +24,7 @@
 #ifndef __NS_EELINT_H__
 #define __NS_EELINT_H__
 
-#ifdef _WIN32
-#include <windows.h>
-#else
 #include "../wdltypes.h"
-#endif
-
 #include "ns-eel.h"
 #include "ns-eel-addfuncs.h"
 
