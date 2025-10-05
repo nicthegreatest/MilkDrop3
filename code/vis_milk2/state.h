@@ -35,11 +35,17 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdio.h>
 #include "texmgr.h"
 
-#include <d3dx9math.h> // for D3DXVECTOR3
-
 //#include "evallib/eval.h"
 #include "../ns-eel2/ns-eel.h"
 #include "md_defines.h"
+
+struct Vector3 {
+    float x, y, z;
+};
+
+struct Vector4 {
+    float x, y, z, w;
+};
 
 // flags for CState::RecompileExpressions():
 #define RECOMPILE_PRESET_CODE  1
@@ -97,8 +103,8 @@ protected:
 class CShape
 {
 public:
-    int  Import(FILE* f, const wchar_t* szFile, int i);
-    int  Export(FILE* f, const wchar_t* szFile, int i);
+    int  Import(FILE* f, const char* szFile, int i);
+    int  Export(FILE* f, const char* szFile, int i);
 
     int   enabled;
     int   sides;
@@ -157,8 +163,8 @@ public:
 class CWave
 {
 public:
-    int  Import(FILE* f, const wchar_t *szFile, int i);
-    int  Export(FILE* f, const wchar_t* szFile, int i);
+    int  Import(FILE* f, const char *szFile, int i);
+    int  Export(FILE* f, const char* szFile, int i);
 
     int   enabled;
     int   samples;
@@ -224,7 +230,7 @@ typedef struct
 
 //#define MAX_EVALS 8
 
-#define INVALID_PRESET_DESC L"<no description>"  // this should contain invalid filename chars, so there is never a conflict...
+#define INVALID_PRESET_DESC "<no description>"  // this should contain invalid filename chars, so there is never a conflict...
 
 #define STATE_GENERAL 1  // and postproc (old presets) or blur, etc. (new presets)
 #define STATE_MOTION  2  // and equations
@@ -246,13 +252,13 @@ public:
 	void Default(DWORD ApplyFlags=STATE_ALL);
 	void Randomize(int nMode);
 	void StartBlendFrom(CState *s_from, float fAnimTime, float fTimespan);
-	bool Import(const wchar_t *szIniFile, float fTime, CState* pOldState, DWORD ApplyFlags=STATE_ALL);
-	bool Export(const wchar_t *szIniFile);
+	bool Import(const char *szIniFile, float fTime, CState* pOldState, DWORD ApplyFlags=STATE_ALL);
+	bool Export(const char *szIniFile);
 	void RecompileExpressions(int flags=0xFFFFFFFF, int bReInit=1);
     void GenDefaultWarpShader();
     void GenDefaultCompShader();
 
-	wchar_t m_szDesc[512];		// this is just the filename, without a path or extension.
+	char m_szDesc[512];		// this is just the filename, without a path or extension.
 	//char m_szSection[256];
 
     int                 m_nMinPSVersion;  // the min of the warp & comp values...
@@ -356,10 +362,10 @@ public:
 
     // some random stuff for driving shaders:
     void         RandomizePresetVars();
-    D3DXVECTOR4  m_rand_preset; // 4 random floats (0..1); randomized @ preset load; fed to pixel shaders.  --FIXME (blending)
-    D3DXVECTOR3  m_xlate[20];
-    D3DXVECTOR3  m_rot_base[20];
-    D3DXVECTOR3  m_rot_speed[20];
+    Vector4  m_rand_preset; // 4 random floats (0..1); randomized @ preset load; fed to pixel shaders.  --FIXME (blending)
+    Vector3  m_xlate[20];
+    Vector3  m_rot_base[20];
+    Vector3  m_rot_speed[20];
 
 	//COscillator			m_waveR;
 	//COscillator			m_waveG;
