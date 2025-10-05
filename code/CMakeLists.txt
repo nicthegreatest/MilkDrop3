@@ -24,10 +24,12 @@ set(NSEEL_SOURCES
 )
 
 # Find necessary libraries
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(PORTAUDIO REQUIRED portaudio-2.0)
+
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(glfw3 REQUIRED)
-find_package(PortAudio REQUIRED)
 
 set(VIS_MILK2_SOURCES
     vis_milk2/main.cpp
