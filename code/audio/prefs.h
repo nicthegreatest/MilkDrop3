@@ -1,3 +1,4 @@
+#ifdef _WIN32
 // prefs.h
 
 class CPrefs {
@@ -13,3 +14,4 @@ public:
     ~CPrefs();
 
 };
+#endif // _WIN32

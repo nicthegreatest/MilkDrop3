@@ -37,24 +37,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "textmgr.h"
 #include <vector>
 
-// Stubs for Windows types
-struct HWND__; typedef HWND__* HWND;
-struct HINSTANCE__; typedef HINSTANCE__* HINSTANCE;
-struct HFONT__; typedef HFONT__* HFONT;
-typedef void* LPD3DXFONT;
-typedef void* LPDIRECT3DDEVICE9;
-struct D3DCAPS9 {};
-enum D3DFORMAT {};
-struct RECT { long left, top, right, bottom; };
-struct GUID { unsigned long Data1; unsigned short Data2; unsigned short Data3; unsigned char Data4[8]; };
-typedef unsigned long DWORD;
-typedef unsigned short USHORT;
-typedef unsigned int UINT;
-typedef long LONG_PTR;
-typedef long LRESULT;
-typedef unsigned int UINT_PTR;
-typedef UINT_PTR WPARAM;
-typedef LONG_PTR LPARAM;
+// Windows-specific types are now defined in shell_defines.h
 
 
 #define TIME_HIST_SLOTS 128     // # of slots used if fps > 60.  half this many if fps==30.
@@ -62,7 +45,7 @@ typedef LONG_PTR LPARAM;
 
 typedef struct
 {
-    char szFace[256];
+    wchar_t szFace[256];
     int nSize;  // size requested @ font creation time
     int bBold;
     int bItalic;
@@ -131,7 +114,7 @@ protected:
     int          m_skin;
     int          m_fix_slow_text;
     td_fontinfo  m_fontinfo[NUM_BASIC_FONTS + NUM_EXTRA_FONTS];
-    struct DisplayMode { int Width; int Height; int RefreshRate; int Format; };
+    struct DisplayMode { int Width; int Height; int RefreshRate; D3DFORMAT Format; };
     DisplayMode m_disp_mode_fs;
 
     virtual void OverrideDefaults()      = 0;
@@ -212,9 +195,9 @@ public:
     void ToggleHelp();
 	void READ_FONT(int n);
 	void WRITE_FONT(int n);
-    static LRESULT CALLBACK WindowProc(HWND hWnd, unsigned uMsg, WPARAM wParam, LPARAM lParam);
-    static LRESULT CALLBACK DesktopWndProc(HWND hWnd, unsigned uMsg, WPARAM wParam, LPARAM lParam);
-    static LRESULT CALLBACK VJModeWndProc(HWND hWnd, unsigned uMsg, WPARAM wParam, LPARAM lParam);
+    static LRESULT WindowProc(HWND hWnd, unsigned uMsg, WPARAM wParam, LPARAM lParam);
+    static LRESULT DesktopWndProc(HWND hWnd, unsigned uMsg, WPARAM wParam, LPARAM lParam);
+    static LRESULT VJModeWndProc(HWND hWnd, unsigned uMsg, WPARAM wParam, LPARAM lParam);
 private:
     void DrawAndDisplay(int redraw);
     void ReadConfig();

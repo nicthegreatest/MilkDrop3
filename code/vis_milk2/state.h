@@ -33,6 +33,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <memory.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "shell_defines.h"
 #include "texmgr.h"
 
 //#include "evallib/eval.h"

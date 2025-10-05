@@ -31,15 +31,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define GEISS_TEXT_DRAWING_MANAGER 1
 
 #include "md_defines.h"
+#include "shell_defines.h"
 
 // Stubs for Windows/DirectX types
-struct HWND__; typedef HWND__* HWND;
-typedef void* LPD3DXFONT;
-typedef void* LPDIRECT3DDEVICE9;
-typedef void* IDirect3DTexture9;
-struct RECT { long left, top, right, bottom; };
 typedef RECT* LPRECT;
-typedef unsigned long DWORD;
 
 #define MAX_MSGS 4096
 
@@ -62,7 +57,7 @@ public:
     CTextManager();
     ~CTextManager();
 
-    void Init(LPDIRECT3DDEVICE9 lpDevice, IDirect3DTexture9* lpTextSurface, int bAdditive);
+    void Init(LPDIRECT3DDEVICE9 lpDevice, IDirect3DTexture9** lpTextSurface, int bAdditive);
     void Finish();
 
     int  DrawTextA(LPD3DXFONT pFont, const char* szText, int len, RECT* pRect, DWORD flags, DWORD color, bool bBlackBox, DWORD boxColor=0xFF000000);
@@ -74,7 +69,7 @@ public:
 
 protected:
     LPDIRECT3DDEVICE9    m_lpDevice;
-    IDirect3DTexture9*   m_lpTextSurface;
+    IDirect3DTexture9**  m_lpTextSurface;
     int                  m_blit_additively;
 
     int       m_nMsg[2];

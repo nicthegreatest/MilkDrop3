@@ -31,16 +31,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _MILKDROP_MENU_H_ 1
 
 #include <stddef.h> // for ptrdiff_t
+#include "shell_defines.h"
 
-// Stubs for Windows types
-struct HWND__; typedef HWND__* HWND;
-typedef long long INT_PTR;
-typedef INT_PTR LPARAM;
-typedef unsigned int UINT_PTR;
-typedef UINT_PTR WPARAM;
-typedef long LRESULT;
-typedef unsigned int UINT;
-struct RECT { long left, top, right, bottom; };
+// Windows-specific types are now defined in shell_defines.h.
 
 //----------------------------------------
 

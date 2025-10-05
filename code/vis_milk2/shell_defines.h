@@ -30,6 +30,142 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __NULLSOFT_DX9_PLUGIN_SHELL_SHELL_DEFINES_H__
 #define __NULLSOFT_DX9_PLUGIN_SHELL_SHELL_DEFINES_H__ 1
 
+#include <cstdint>
+#include <string.h> // for memset
+
+// Stubs for Windows types
+struct HWND__; typedef HWND__* HWND;
+struct HINSTANCE__; typedef HINSTANCE__* HINSTANCE;
+struct HFONT__; typedef HFONT__* HFONT;
+typedef void* LPD3DXFONT;
+typedef void* LPDIRECT3DDEVICE9;
+struct D3DCAPS9 {
+    uint32_t MaxPrimitiveCount;
+    uint32_t SrcBlendCaps;
+    uint32_t DestBlendCaps;
+};
+enum D3DFORMAT {};
+struct RECT { long left, top, right, bottom; };
+struct GUID { uint32_t Data1; uint16_t Data2; uint16_t Data3; uint8_t Data4[8]; };
+typedef uint32_t DWORD;
+typedef uint16_t USHORT;
+typedef uint16_t WORD;
+typedef unsigned int UINT;
+typedef intptr_t LONG_PTR;
+typedef intptr_t LRESULT;
+typedef uintptr_t UINT_PTR;
+typedef UINT_PTR WPARAM;
+typedef LONG_PTR LPARAM;
+typedef void* LPVOID;
+struct IUnknown { virtual long Release() { return 0; }; };
+
+
+// More stubs for DirectX types
+typedef void* LPDIRECT3DBASETEXTURE9;
+typedef void* LPDIRECT3DTEXTURE9;
+typedef void* LPD3DXCONSTANTTABLE;
+typedef void* IDirect3DVertexShader9;
+typedef void* IDirect3DPixelShader9;
+typedef void* LPD3DXBUFFER;
+typedef void* IDirect3DVertexDeclaration9;
+typedef void* D3DXVECTOR4;
+typedef void* D3DXHANDLE;
+typedef void* LPDIRECT3DSURFACE9;
+typedef void* IDirect3DSurface9;
+typedef void* D3DXMATRIX;
+
+
+#define MAX_PATH 260
+#define WM_KEYDOWN 0x0100
+
+#ifndef FALSE
+#define FALSE 0
+#endif
+#ifndef TRUE
+#define TRUE 1
+#endif
+
+#define D3D_OK 0
+#define D3DCOLOR_RGBA(r,g,b,a) ((((a)&0xff)<<24)|(((r)&0xff)<<16)|(((g)&0xff)<<8)|((b)&0xff))
+#define D3DPT_TRIANGLESTRIP 0
+#define D3DPT_TRIANGLELIST 0
+#define D3DPT_TRIANGLEFAN 0
+#define D3DPT_LINELIST 0
+#define D3DPT_LINESTRIP 0
+#define D3DPT_POINTLIST 0
+#define WFVERTEX_FORMAT 0
+#define MYVERTEX_FORMAT 0
+#define SPRITEVERTEX_FORMAT 0
+#define D3DRS_ALPHABLENDENABLE 0
+#define D3DRS_SRCBLEND 0
+#define D3DRS_DESTBLEND 0
+#define D3DBLEND_SRCALPHA 0
+#define D3DBLEND_INVSRCALPHA 0
+#define D3DBLEND_ONE 0
+#define D3DBLEND_ZERO 0
+#define D3DBLEND_INVDESTCOLOR 0
+#define D3DBLEND_DESTCOLOR 0
+#define D3DCLEAR_TARGET 0
+#define D3DRS_SHADEMODE 0
+#define D3DSHADE_GOURAUD 0
+#define D3DRS_SPECULARENABLE 0
+#define D3DRS_CULLMODE 0
+#define D3DCULL_NONE 0
+#define D3DRS_ZENABLE 0
+#define D3DRS_ZWRITEENABLE 0
+#define D3DRS_LIGHTING 0
+#define D3DRS_COLORVERTEX 0
+#define D3DRS_FILLMODE 0
+#define D3DFILL_SOLID 0
+#define D3DRS_AMBIENT 0
+#define D3DRS_CLIPPING 0
+#define D3DRS_WRAP0 0
+#define D3DSAMP_ADDRESSU 0
+#define D3DSAMP_ADDRESSV 0
+#define D3DSAMP_ADDRESSW 0
+#define D3DTADDRESS_WRAP 0
+#define D3DTADDRESS_CLAMP 0
+#define D3DSAMP_MAGFILTER 0
+#define D3DSAMP_MINFILTER 0
+#define D3DSAMP_MIPFILTER 0
+#define D3DTEXF_LINEAR 0
+#define D3DTEXF_POINT 0
+#define D3DTEXF_ANISOTROPIC 0
+#define D3DSAMP_MAXANISOTROPY 0
+#define D3DTSS_COLOROP 0
+#define D3DTOP_MODULATE 0
+#define D3DTSS_COLORARG1 0
+#define D3DTA_DIFFUSE 0
+#define D3DTSS_COLORARG2 0
+#define D3DTA_TEXTURE 0
+#define D3DTOP_DISABLE 0
+#define D3DTSS_ALPHAOP 0
+#define D3DTOP_SELECTARG1 0
+#define D3DTSS_ALPHAARG1 0
+#define D3DTSS_ALPHAARG2 0
+#define D3DRS_POINTSIZE 0
+#define D3DFMT_R5G6B5 0
+#define D3DFMT_X1R5G5B5 0
+#define D3DFMT_A1R5G5B5 0
+#define D3DFMT_A4R4G4B4 0
+#define D3DPBLENDCAPS_INVDESTCOLOR 0
+#define D3DPBLENDCAPS_DESTCOLOR 0
+#define D3DBLEND_SRCCOLOR 0
+#define D3DBLEND_INVSRCCOLOR 0
+#define D3DFMT_INDEX16 0
+
+#define DT_SINGLELINE 0
+#define DT_CALCRECT 0
+#define DT_CENTER 0
+#define DEFAULT_CHARSET 0
+#define OUT_DEFAULT_PRECIS 0
+#define CLIP_DEFAULT_PRECIS 0
+#define ANTIALIASED_QUALITY 0
+#define DEFAULT_QUALITY 0
+#define DEFAULT_PITCH 0
+
+#define ZeroMemory(p, size) memset(p, 0, size)
+
 #define DEFAULT_FULLSCREEN_WIDTH  640
 #define DEFAULT_FULLSCREEN_HEIGHT 480
 #define MAX_ICON_TEXTURES 8

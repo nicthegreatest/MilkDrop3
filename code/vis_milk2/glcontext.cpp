@@ -56,7 +56,7 @@ void GLContext::Internal_CleanUp()
     m_ready = false;
 }
 
-BOOL GLContext::Internal_Init(GLCONTEXT_PARAMS *pParams, BOOL bFirstInit)
+bool GLContext::Internal_Init(GLCONTEXT_PARAMS *pParams, bool bFirstInit)
 {
     memcpy(&m_current_mode, pParams, sizeof(GLCONTEXT_PARAMS));
 
@@ -86,16 +86,16 @@ BOOL GLContext::Internal_Init(GLCONTEXT_PARAMS *pParams, BOOL bFirstInit)
     return true;
 }
 
-BOOL GLContext::StartOrRestartDevice(GLCONTEXT_PARAMS *pParams)
+bool GLContext::StartOrRestartDevice(GLCONTEXT_PARAMS *pParams)
 {
     if (!m_ready)
     {
-        return Internal_Init(pParams, TRUE);
+        return Internal_Init(pParams, true);
     }
     else
     {
         m_ready = false;
-        return Internal_Init(pParams, FALSE);
+        return Internal_Init(pParams, false);
     }
 }
 

@@ -1,3 +1,4 @@
+#ifdef _WIN32
 // cleanup.h
 
 class AudioClientStopOnExit {
@@ -119,3 +120,4 @@ public:
 private:
     HANDLE m_h;
 };
+#endif // _WIN32
