@@ -1,6 +1,7 @@
 // audiobuf.cpp
 
 #include "audiobuf.h"
+#include <cstring>
 
 #define SAMPLE_SIZE_LPB 576 // Max number of audio samples stored in circular buffer. Should be no less than SAMPLE_SIZE. Expected sampling rate is 44100 Hz or 48000 Hz (samples per second).
 
@@ -55,7 +56,7 @@ union u_type
     uint8_t Bytes[4];
 };
 
-int8_t GetChannelSample(const BYTE *pData, int BlockOffset, int ChannelOffset, const bool bInt16) {
+int8_t GetChannelSample(const unsigned char *pData, int BlockOffset, int ChannelOffset, const bool bInt16) {
     u_type sample;
 
     sample.IntVar = 0;
@@ -84,7 +85,7 @@ int8_t GetChannelSample(const BYTE *pData, int BlockOffset, int ChannelOffset, c
 //   pwfx->nBlockAlign;        /* ANY block size of data */
 //   pwfx->wBitsPerSample;     /* 16 or 32 number of bits per sample of mono data */
 
-void SetAudioBuf(const BYTE *pData, const UINT32 nNumFramesToRead, const WAVEFORMATEX *pwfx, const bool bInt16) {
+void SetAudioBuf(const unsigned char *pData, const uint32_t nNumFramesToRead, const WAVEFORMATEX *pwfx, const bool bInt16) {
     int BlockOffset;
 
     int8_t LeftSample8;

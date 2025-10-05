@@ -30,6 +30,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __NULLSOFT_DX9_EXAMPLE_PLUGIN_SUPPORT_H__
 #define __NULLSOFT_DX9_EXAMPLE_PLUGIN_SUPPORT_H__ 1
 
+#ifdef _WIN32
+
 #include <d3dx9.h>
 
 void MakeWorldMatrix( D3DXMATRIX* pOut,
@@ -81,15 +83,11 @@ typedef struct _SPRITEVERTEX
     float tu, tv;    // texture coordinates for texture #0
 } SPRITEVERTEX, *LPSPRITEVERTEX;
 
-// Also prepare vertex format descriptors for each
-//   of the 3 kinds of vertices we'll be using:
-// note: D3DFVF_TEXCOORDSIZEm(n): m = the dimension, n = the index
-// AVOID D3DFVF_TEXCOORDSIZE4 - I've seen probs (blending between shader and non-shader presets) on vaio laptop w/6200!
 #define MYVERTEX_FORMAT     (D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX3 | D3DFVF_TEXCOORDSIZE2(0) | D3DFVF_TEXCOORDSIZE2(1) | D3DFVF_TEXCOORDSIZE2(2))
 #define WFVERTEX_FORMAT     (D3DFVF_XYZ | D3DFVF_DIFFUSE              )
 #define SPRITEVERTEX_FORMAT (D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1 | D3DFVF_TEXCOORDSIZE2(0) )
 
-void    FormatSongTime(double seconds, wchar_t *dst);
+int GetDX9TexFormatBitsPerPixel(D3DFORMAT fmt);
 
 //#define PROFILING
 #ifdef PROFILING
@@ -100,6 +98,42 @@ void    FormatSongTime(double seconds, wchar_t *dst);
     #define PROFILE_END(s)
 #endif
 
-int GetDX9TexFormatBitsPerPixel(D3DFORMAT fmt);
+#else
+
+// Non-windows stubs
+#include <cstdint>
+
+typedef uint32_t DWORD;
+
+// Define vertex formats you'll be using here:
+typedef struct _MYVERTEX
+{
+    float x, y, z;     // screen position + Z-buffer depth
+    DWORD Diffuse;     // diffuse color
+    float tu, tv;           // DYNAMIC
+     float tu_orig, tv_orig; // STATIC
+    float rad, ang;         // STATIC
+} MYVERTEX, *LPMYVERTEX;
+
+
+typedef struct _WFVERTEX
+{
+    float x, y, z;
+    DWORD Diffuse;   // diffuse color. also acts as filler; aligns struct to 16 bytes (good for random access/indexed prims)
+} WFVERTEX, *LPWFVERTEX;
+
+
+typedef struct _SPRITEVERTEX
+{
+    float x, y;      // screen position
+    float z;         // Z-buffer depth
+    DWORD Diffuse;   // diffuse color. also acts as filler; aligns struct to 16 bytes (good for random access/indexed prims)
+    float tu, tv;    // texture coordinates for texture #0
+} SPRITEVERTEX, *LPSPRITEVERTEX;
+
+#define PROFILE_BEGIN
+#define PROFILE_END(s)
+
+#endif // _WIN32
 
 #endif

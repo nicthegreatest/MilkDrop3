@@ -3,9 +3,11 @@
 #include <GLFW/glfw3.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <thread>
 
 #include "wasabi.h"
 #include "../audio/common.h"
+#include "../audio/loopback-capture.h"
 
 CPlugin g_plugin;
 _locale_t g_use_C_locale;
@@ -16,6 +18,8 @@ static unsigned char pcmLeftIn[SAMPLE_SIZE];
 static unsigned char pcmRightIn[SAMPLE_SIZE];
 static unsigned char pcmLeftOut[SAMPLE_SIZE];
 static unsigned char pcmRightOut[SAMPLE_SIZE];
+
+static LoopbackCaptureThreadFunctionArguments g_audio_thread_args;
 
 void error_callback(int error, const char* description)
 {
@@ -70,6 +74,11 @@ int main(void)
 
     g_plugin.PluginPreInitialize(0, 0);
     g_plugin.PluginInitialize(NULL, NULL, NULL, 800, 600);
+
+    // Start the audio capture thread
+    g_audio_thread_args.hr = 0;
+    std::thread audio_thread(LoopbackCaptureThreadFunction, &g_audio_thread_args);
+    audio_thread.detach();
 
     while (!glfwWindowShouldClose(window))
     {

@@ -1,7 +1,20 @@
 // audiobuf.h
 
 #include <mutex>
-#include <windows.h>
+#include <cstdint>
+
+#ifndef _WIN32
+typedef struct tWAVEFORMATEX
+{
+    uint16_t wFormatTag;
+    uint16_t nChannels;
+    uint32_t nSamplesPerSec;
+    uint32_t nAvgBytesPerSec;
+    uint16_t nBlockAlign;
+    uint16_t wBitsPerSample;
+    uint16_t cbSize;
+} WAVEFORMATEX;
+#endif
 
 // Reset audio buffer discarding stored audio data
 void ResetAudioBuf();
@@ -10,4 +23,4 @@ void ResetAudioBuf();
 void GetAudioBuf(unsigned char *pWaveL, unsigned char *pWaveR, int SamplesCount);
 
 // Save audio data for visualizer
-void SetAudioBuf(const BYTE *pData, const UINT32 nNumFramesToRead, const WAVEFORMATEX *pwfx, const bool bInt16);
+void SetAudioBuf(const unsigned char *pData, const uint32_t nNumFramesToRead, const WAVEFORMATEX *pwfx, const bool bInt16);

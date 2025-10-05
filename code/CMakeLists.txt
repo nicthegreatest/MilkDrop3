@@ -10,17 +10,34 @@ set(AUDIO_SOURCES
     audio/audiobuf.cpp
     audio/log.cpp
     audio/loopback-capture-portaudio.cpp
-    audio/prefs.cpp
 )
 
+if(WIN32)
+    list(APPEND AUDIO_SOURCES audio/prefs.cpp)
+endif()
+
 set(NSEEL_SOURCES
-    ns-eel2/nseel-caltab.c
-    ns-eel2/nseel-cfunc.c
+    ns-eel2/numericSys/FilterDesign/generalFdesign.c
+    ns-eel2/numericSys/FilterDesign/eqnerror.c
+    ns-eel2/numericSys/FilterDesign/firls.c
+    ns-eel2/numericSys/FilterDesign/cos_fib_paraunitary.c
+    ns-eel2/numericSys/SolveLinearSystem/inv.c
+    ns-eel2/numericSys/SolveLinearSystem/pinv.c
+    ns-eel2/numericSys/SolveLinearSystem/mldivide.c
+    ns-eel2/numericSys/SolveLinearSystem/mrdivide.c
+    ns-eel2/numericSys/solvopt.c
+    ns-eel2/numericSys/cpoly.c
+    ns-eel2/numericSys/MersenneTwister.c
+    ns-eel2/numericSys/quadprog.c
+    ns-eel2/numericSys/codelet.c
+    ns-eel2/numericSys/FFTConvolver.c
+    ns-eel2/cpthread.c
+    ns-eel2/s_str.c
+    ns-eel2/fft.c
     ns-eel2/nseel-compiler.c
-    ns-eel2/nseel-eval.c
-    ns-eel2/nseel-lextab.c
     ns-eel2/nseel-ram.c
-    ns-eel2/nseel-yylex.c
+    ns-eel2/y.tab.c
+    ns-eel2/loose_eel.c
 )
 
 # Find necessary libraries

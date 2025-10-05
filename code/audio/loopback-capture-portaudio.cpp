@@ -1,4 +1,4 @@
-#include "common.h"
+#include "loopback-capture.h"
 #include "portaudio.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -65,9 +65,8 @@ static int recordCallback(const void *inputBuffer, void *outputBuffer,
     return finished;
 }
 
-DWORD WINAPI LoopbackCaptureThreadFunction(LPVOID pContext)
+void LoopbackCaptureThreadFunction(LoopbackCaptureThreadFunctionArguments *pArgs)
 {
-    LoopbackCaptureThreadFunctionArguments *pArgs = (LoopbackCaptureThreadFunctionArguments*)pContext;
     pArgs->hr = 0; // S_OK
 
     PaStreamParameters inputParameters;
@@ -84,7 +83,7 @@ DWORD WINAPI LoopbackCaptureThreadFunction(LPVOID pContext)
     if (data.recordedSamples == NULL)
     {
         pArgs->hr = -1; // E_OUTOFMEMORY
-        return 1;
+        return;
     }
     memset(data.recordedSamples, 0, numBytes);
 
@@ -128,7 +127,7 @@ DWORD WINAPI LoopbackCaptureThreadFunction(LPVOID pContext)
 
     Pa_Terminate();
     free(data.recordedSamples);
-    return 0;
+    return;
 
 error:
     Pa_Terminate();
@@ -136,5 +135,5 @@ error:
         free(data.recordedSamples);
     }
     pArgs->hr = err;
-    return 1;
+    return;
 }
