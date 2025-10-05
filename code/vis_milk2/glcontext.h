@@ -53,7 +53,7 @@ class GLContext
 public:
     GLContext(GLFWwindow* window, wchar_t* szIniFile);
     ~GLContext();
-    BOOL StartOrRestartDevice(GLCONTEXT_PARAMS *pParams);
+    bool StartOrRestartDevice(GLCONTEXT_PARAMS *pParams);
     void OnTrulyExiting() { m_truly_exiting = 1; }
     void UpdateMonitorWorkRect();
     int  GetBitDepth() { return m_bpp; };
@@ -85,15 +85,15 @@ public:
 
 protected:
     wchar_t m_szIniFile[260];
-    char m_szDriver[MAX_DEVICE_IDENTIFIER_STRING];
-    char m_szDesc[MAX_DEVICE_IDENTIFIER_STRING];
+    char m_szDriver[512];
+    char m_szDesc[512];
     int  m_minimize_winamp;
     int  m_winamp_minimized;
     int  m_truly_exiting;
     int  m_bpp;
 
     void WriteSafeWindowPos();
-    BOOL Internal_Init(GLCONTEXT_PARAMS *pParams, BOOL bFirstInit);
+    bool Internal_Init(GLCONTEXT_PARAMS *pParams, bool bFirstInit);
     void Internal_CleanUp();
 };
 

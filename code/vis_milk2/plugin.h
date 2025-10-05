@@ -48,7 +48,7 @@ typedef enum { TEX_DISK, TEX_VS, TEX_BLUR0, TEX_BLUR1, TEX_BLUR2, TEX_BLUR3, TEX
 typedef enum { UI_REGULAR, UI_MENU, UI_LOAD, UI_LOAD_DEL, UI_LOAD_RENAME, UI_SAVEAS, UI_SAVE_OVERWRITE, UI_EDIT_MENU_STRING, UI_CHANGEDIR, UI_IMPORT_WAVE, UI_EXPORT_WAVE, UI_IMPORT_SHAPE, UI_EXPORT_SHAPE, UI_UPGRADE_PIXEL_SHADER, UI_MASHUP } ui_mode;
 typedef struct { float rad; float ang; float a; float c;  } td_vertinfo; // blending: mix = max(0,min(1,a*t + c));
 typedef char* CHARPTR;
-LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+LRESULT WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 #define MY_FFT_SAMPLES 512     // for old [pre-vms] milkdrop sound analysis
 typedef struct
@@ -189,6 +189,8 @@ typedef struct
 } ErrorMsg;
 
 typedef std::vector<ErrorMsg> ErrorMsgList;
+
+class CShaderParams;
 typedef std::vector<CShaderParams*> CShaderParamsList;
 
 class CShaderParams
@@ -559,7 +561,7 @@ public:
         void        LoadPerFrameEvallibVars(CState* pState);
         void        LoadCustomWavePerFrameEvallibVars(CState* pState, int i);
         void        LoadCustomShapePerFrameEvallibVars(CState* pState, int i, int instance);
-    	void		WriteRealtimeConfig();	// called on Finish()
+	void		WriteRealtimeConfig();	// called on Finish()
 	    void		dumpmsg(wchar_t *s);
 	    void		Randomize();
 	    void		LoadRandomPreset(float fBlendTime);

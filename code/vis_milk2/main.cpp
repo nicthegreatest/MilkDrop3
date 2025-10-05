@@ -4,13 +4,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <thread>
+#include <locale.h>
 
 #include "wasabi.h"
 #include "../audio/common.h"
 #include "../audio/loopback-capture.h"
 
 CPlugin g_plugin;
-_locale_t g_use_C_locale;
+locale_t g_use_C_locale;
 
 #define SAMPLE_SIZE 576
 

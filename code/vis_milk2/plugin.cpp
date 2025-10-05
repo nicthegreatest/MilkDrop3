@@ -33,6 +33,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <locale.h>
 #include <stdio.h>
 #include <string.h>
+#include <wchar.h>
+
 
 #define FRAND ((rand() % 7381)/7380.0f)
 
@@ -120,6 +122,11 @@ int mystrcmpi(const char *s1, const char *s2)
 		return (LC2UC[(unsigned char)s1[i]] < LC2UC[(unsigned char)s2[i]]) ? -1 : 1;
 }
 
+void StripComments(char *str)
+{
+    // stub
+}
+
 bool ReadFileToString(const char* szBaseFilename, char* szDestText, int nMaxBytes, bool bConvertLFsToSpecialChar)
 {
     char szFile[260];
@@ -128,10 +135,9 @@ bool ReadFileToString(const char* szBaseFilename, char* szDestText, int nMaxByte
     FILE* f = fopen(szFile, "rb");
     if (!f)
     {
-        char buf[1024], title[64];
-		sprintf(buf, "Unable to read data file: %s", szFile);
+        wchar_t buf[1024];
+		swprintf(buf, 1024, L"Unable to read data file: %hs", szFile);
 		g_plugin.dumpmsg(buf);
-		//MessageBox(NULL, buf, "MilkDrop Error", MB_OK|MB_SETFOREGROUND|MB_TOPMOST );
 		return false;
     }
     int len = 0;
@@ -189,7 +195,7 @@ void CPlugin::OverrideDefaults()
 
 void CPlugin::MyPreInitialize()
 {
-	g_szHelp = (char*)"Help text not implemented yet.";
+	g_szHelp = (char*)L"Help text not implemented yet.";
 	m_bFirstRun		            = true;
     m_bInitialPresetSelected    = false;
 	m_fBlendTimeUser			= 1.7f;
@@ -295,15 +301,17 @@ void CPlugin::MyPreInitialize()
 	m_nNumericInputDigits = 0;
 	m_supertext.bRedrawSuperText = false;
 	m_supertext.fStartTime = -1.0f;
-    sprintf(m_szMilkdrop2Path, "plugins/MilkDrop2/");
-    sprintf(m_szPresetDir, "%spresets/", m_szMilkdrop2Path);
-    char szConfigDir[260] = {0};
-    strcpy(szConfigDir, GetConfigIniFile());
-    char* p = strrchr(szConfigDir, '/');
-    if (!p) p = strrchr(szConfigDir, '\\');
+    swprintf(m_szMilkdrop2Path, MAX_PATH, L"plugins/MilkDrop2/");
+    swprintf(m_szPresetDir, MAX_PATH, L"%lspresets/", m_szMilkdrop2Path);
+    char szConfigDirA[260] = {0};
+    strncpy(szConfigDirA, GetConfigIniFileA(), 260);
+    char* p = strrchr(szConfigDirA, '/');
+    if (!p) p = strrchr(szConfigDirA, '\\');
     if (p) *(p+1) = 0;
-	sprintf(m_szMsgIniFile, "%s%s", szConfigDir, "milk_msg.ini" );
-	sprintf(m_szImgIniFile, "%s%s", szConfigDir, "milk_img.ini" );
+    wchar_t szConfigDirW[260] = {0};
+    mbstowcs(szConfigDirW, szConfigDirA, 260);
+	swprintf(m_szMsgIniFile, MAX_PATH, L"%ls%s", szConfigDirW, "milk_msg.ini" );
+	swprintf(m_szImgIniFile, MAX_PATH, L"%ls%s", szConfigDirW, "milk_img.ini" );
 }
 
 void CPlugin::MyReadConfig() { /* Stub */ }
@@ -351,8 +359,8 @@ int CPlugin::AllocateMyDX9Stuff()
     m_nFramesSinceResize = 0;
     m_fAspectX = (m_nTexSizeY > m_nTexSizeX) ? m_nTexSizeX/(float)m_nTexSizeY : 1.0f;
     m_fAspectY = (m_nTexSizeX > m_nTexSizeY) ? m_nTexSizeY/(float)m_nTexSizeX : 1.0f;
-    m_fInvAspectX = 1.0f/m_fAspectX;
-    m_fInvAspectY = 1.0f/m_fAspectY;
+	m_fInvAspectX = 1.0f/m_fAspectX;
+	m_fInvAspectY = 1.0f/m_fAspectY;
 	m_verts      = new MYVERTEX[(m_nGridX+1)*(m_nGridY+1)];
 	m_verts_temp = new MYVERTEX[(m_nGridX+2) * 4];
 	m_vertinfo   = new td_vertinfo[(m_nGridX+1)*(m_nGridY+1)];
@@ -373,7 +381,7 @@ void CPlugin::CleanUpMyDX9Stuff(int final_cleanup)
     m_pState->m_bBlending = false;
     if (final_cleanup)
     {
-        WritePrivateProfileInt(m_bPresetLockedByUser, "bPresetLockOnAtStartup", GetConfigIniFile(), "settings");
+        //WritePrivateProfileInt(m_bPresetLockedByUser, "bPresetLockOnAtStartup", GetConfigIniFile(), "settings");
     }
 }
 
@@ -394,10 +402,10 @@ void CPlugin::MyRenderFn(int redraw)
     m_bHasFocus = true; // Simplified
     if (!redraw)
     {
-        GetSongTitle(m_szSongTitle, sizeof(m_szSongTitle)-1);
-        if (strcmp(m_szSongTitle, m_szSongTitlePrev))
+        GetSongTitle(m_szSongTitle, sizeof(m_szSongTitle)/sizeof(wchar_t) -1);
+        if (wcscmp(m_szSongTitle, m_szSongTitlePrev))
         {
-            strncpy(m_szSongTitlePrev, m_szSongTitle, 512);
+            wcsncpy(m_szSongTitlePrev, m_szSongTitle, 512);
             if (m_bSongTitleAnims)
                 LaunchSongTitleAnim();
         }
@@ -416,63 +424,61 @@ void CPlugin::MyRenderFn(int redraw)
 
 void CPlugin::MyRenderUI(int *upper_left_corner_y, int *upper_right_corner_y, int *lower_left_corner_y, int *lower_right_corner_y, int xL, int xR)
 {
-    // Stubbed out
 }
 LRESULT CPlugin::MyWindowProc(HWND hWnd, unsigned uMsg, WPARAM wParam, LPARAM lParam)
 {
-    return 1; // Not handled
+    return 1;
 }
-void CPlugin::GetSongTitle(char *szSongTitle, int nSize)
+void CPlugin::GetSongTitle(wchar_t *szSongTitle, int nSize)
 {
     emulatedWinampSongTitle = "Playback Stopped";
-    strncpy(szSongTitle, emulatedWinampSongTitle.c_str(), nSize);
+    mbstowcs(szSongTitle, emulatedWinampSongTitle.c_str(), nSize);
 }
-void CPlugin::dumpmsg(const char *s)
+void CPlugin::dumpmsg(wchar_t *s)
 {
-    printf("%s\n", s);
+    wprintf(L"%ls\n", s);
 }
 void CPlugin::LoadRandomPreset(float fBlendTime)
 {
-    // Simplified stub
 	if (m_nPresets - m_nDirs == 0) return;
 	m_nCurrentPreset = m_nDirs + (rand() % (m_nPresets - m_nDirs));
-	char szFile[260];
-	sprintf(szFile, "%s%s", m_szPresetDir, m_presets[m_nCurrentPreset].szFilename.c_str());
+	wchar_t szFile[260];
+	swprintf(szFile, 260, L"%ls%ls", m_szPresetDir, m_presets[m_nCurrentPreset].szFilename.c_str());
     LoadPreset(szFile, fBlendTime);
 }
-void CPlugin::LoadPreset(const char *szPresetFilename, float fBlendTime)
+void CPlugin::LoadPreset(const wchar_t *szPresetFilename, float fBlendTime)
 {
-    // Simplified stub
-    m_pState->Import(szPresetFilename, GetTime(), m_pOldState, STATE_ALL);
+    char szPresetFilenameA[MAX_PATH];
+    wcstombs(szPresetFilenameA, szPresetFilename, sizeof(szPresetFilenameA));
+    m_pState->Import(szPresetFilenameA, GetTime(), m_pOldState, STATE_ALL);
     m_fPresetStartTime = GetTime();
     m_fNextPresetTime = -1.0f;
 }
 void CPlugin::UpdatePresetList(bool bBackground, bool bForce, bool bTryReselectCurrentPreset)
 {
-    // Simplified synchronous implementation
     m_presets.clear();
     m_nPresets = 0;
     m_nDirs = 0;
     PresetInfo p;
-    p.szFilename = "some_preset.milk";
+    p.szFilename = L"some_preset.milk";
     p.fRatingThis = 3.0f;
     p.fRatingCum = 3.0f;
     m_presets.push_back(p);
     m_nPresets = 1;
     m_bPresetListReady = true;
 }
-void CPlugin::BuildMenus() { /* Stub */ }
-void CPlugin::SetMenusForPresetVersion(int WarpPSVersion, int CompPSVersion) { /* Stub */ }
+void CPlugin::BuildMenus() { }
+void CPlugin::SetMenusForPresetVersion(int WarpPSVersion, int CompPSVersion) { }
 void CPlugin::DoCustomSoundAnalysis()
 {
     memcpy(mysound.fWave[0], m_sound.fWaveform[0], sizeof(float)*576);
     memcpy(mysound.fWave[1], m_sound.fWaveform[1], sizeof(float)*576);
 	myfft.time_to_frequency_domain(mysound.fWave[0], mysound.fSpecLeft);
 }
-void CPlugin::GenWarpPShaderText(char *szShaderText, float decay, bool bWrap) { /* Stub */ }
-void CPlugin::GenCompPShaderText(char *szShaderText, float brightness, float ve_alpha, float ve_zoom, int ve_orient, float hue_shader, bool bBrighten, bool bDarken, bool bSolarize, bool bInvert) { /* Stub */ }
-void CPlugin::LaunchSongTitleAnim() { /* Stub */ }
-void CPlugin::AddError(const char* szMsg, float fDuration, int category, bool bBold) { printf("Error: %s\n", szMsg); }
+void CPlugin::GenWarpPShaderText(char *szShaderText, float decay, bool bWrap) { }
+void CPlugin::GenCompPShaderText(char *szShaderText, float brightness, float ve_alpha, float ve_zoom, int ve_orient, float hue_shader, bool bBrighten, bool bDarken, bool bSolarize, bool bInvert) { }
+void CPlugin::LaunchSongTitleAnim() { }
+void CPlugin::AddError(wchar_t* szMsg, float fDuration, int category, bool bBold) { wprintf(L"Error: %ls\n", szMsg); }
 void CPlugin::ClearErrors(int category) { }
 void CPlugin::SetCurrentPresetRating(float fNewRating) { }
 
@@ -492,11 +498,11 @@ int CPlugin::WaitString_GetCursorColumn() { return 0; }
 int CPlugin::WaitString_GetLineLength() { return 0; }
 void CPlugin::WaitString_SeekUpOneLine() {}
 void CPlugin::WaitString_SeekDownOneLine() {}
-void CPlugin::SavePresetAs(char *szNewFile) {}
-void CPlugin::DeletePresetFile(char *szDelFile) {}
-void CPlugin::RenamePresetFile(char *szOldFile, char *szNewFile) {}
+void CPlugin::SavePresetAs(wchar_t *szNewFile) {}
+void CPlugin::DeletePresetFile(wchar_t *szDelFile) {}
+void CPlugin::RenamePresetFile(wchar_t *szOldFile, wchar_t *szNewFile) {}
 int CPlugin::HandleRegularKey(WPARAM wParam) { return 1; }
-void CPlugin::SeekToPreset(char cStartChar) {}
+void CPlugin::SeekToPreset(wchar_t cStartChar) {}
 void CPlugin::FindValidPresetDir() {}
 void CPlugin::MergeSortPresets(int left, int right) {}
 void CPlugin::ReadCustomMessages() {}
@@ -507,8 +513,8 @@ bool CPlugin::LoadShaders(PShaderSet* sh, CState* pState, bool bTick) { return t
 void CPlugin::UvToMathSpace(float u, float v, float* rad, float* ang) {}
 void CPlugin::ApplyShaderParams(CShaderParams* p, void* pCT, CState* pState) {}
 void CPlugin::RestoreShaderParams() {}
-bool CPlugin::AddNoiseTex(const char* szTexName, int size, int zoom_factor) { return true; }
-bool CPlugin::AddNoiseVol(const char* szTexName, int size, int zoom_factor) { return true; }
+bool CPlugin::AddNoiseTex(const wchar_t* szTexName, int size, int zoom_factor) { return true; }
+bool CPlugin::AddNoiseVol(const wchar_t* szTexName, int size, int zoom_factor) { return true; }
 bool CPlugin::RecompileVShader(const char* szShadersText, VShaderInfo *si, int shaderType, bool bHardErrors) { return true; }
 bool CPlugin::RecompilePShader(const char* szShadersText, PShaderInfo *si, int shaderType, bool bHardErrors, int PSVersion) { return true; }
 bool CPlugin::EvictSomeTexture() { return true; }

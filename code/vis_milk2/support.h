@@ -101,9 +101,7 @@ int GetDX9TexFormatBitsPerPixel(D3DFORMAT fmt);
 #else
 
 // Non-windows stubs
-#include <cstdint>
-
-typedef uint32_t DWORD;
+// DWORD is now defined in pluginshell.h
 
 // Define vertex formats you'll be using here:
 typedef struct _MYVERTEX

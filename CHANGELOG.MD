@@ -2,6 +2,13 @@
 
 This file documents the major changes made to the MilkDrop3 codebase in the effort to port it to Linux.
 
+## Build System and Stubbing (In-Progress)
+
+- **Consolidated Windows/DirectX Types:** All Windows-specific type definitions (e.g., `DWORD`, `RECT`, `HWND`) have been moved to a central header, `shell_defines.h`, to resolve redefinition conflicts across the codebase.
+- **Stubbed DirectX Dependencies:** A significant number of DirectX types, constants, and functions have been stubbed out in `shell_defines.h` and various `.cpp` files. This was a necessary step to satisfy the compiler and achieve a successful build, but the stubs will need to be replaced with functional OpenGL/GLFW code.
+- **Resolved String Mismatches:** Corrected numerous compilation errors by migrating from narrow strings (`char*`) to wide strings (`wchar_t*`) where appropriate, including updating function calls from `strcpy` to `wcscpy`.
+- **Fixed Platform-Specific Function Calls:** Replaced non-standard functions like `min`/`max` with `std::min`/`std::max` and addressed other Windows-specific API calls.
+
 ## Core Changes
 
 - **Replaced `ns-eel2` Library:** The original `ns-eel2` library was missing 64-bit Linux support. It has been entirely replaced with the more modern and cross-platform [EEL_VM library](https://github.com/james34602/EEL_VM). This involved updating the build system to include the new set of source files.
