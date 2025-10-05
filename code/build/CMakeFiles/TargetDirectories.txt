@@ -1,0 +1,3 @@
+/app/code/build/CMakeFiles/milkdrop3.dir
+/app/code/build/CMakeFiles/edit_cache.dir
+/app/code/build/CMakeFiles/rebuild_cache.dir
