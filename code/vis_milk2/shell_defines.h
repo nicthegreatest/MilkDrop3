@@ -60,12 +60,21 @@ typedef void* LPVOID;
 struct IUnknown { virtual long Release() { return 0; }; };
 #endif
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <string.h> // for memset
-#include <assert.h>
-#include <vector>
+
+// More stubs for DirectX types
+typedef void* LPDIRECT3DBASETEXTURE9;
+typedef void* LPDIRECT3DTEXTURE9;
+typedef void* IDirect3DTexture9;
+typedef void* LPD3DXCONSTANTTABLE;
+typedef void* IDirect3DVertexShader9;
+typedef void* IDirect3DPixelShader9;
+typedef void* LPD3DXBUFFER;
+typedef void* IDirect3DVertexDeclaration9;
+typedef void* D3DXVECTOR4;
+typedef void* D3DXHANDLE;
+typedef void* LPDIRECT3DSURFACE9;
+typedef void* IDirect3DSurface9;
+typedef void* D3DXMATRIX;
 
 
 #define MAX_PATH 260
