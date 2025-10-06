@@ -10,7 +10,7 @@
 #include "../audio/common.h"
 #include "../audio/loopback-capture.h"
 
-CPlugin g_plugin;
+extern CPlugin g_plugin;
 locale_t g_use_C_locale;
 
 #define SAMPLE_SIZE 576

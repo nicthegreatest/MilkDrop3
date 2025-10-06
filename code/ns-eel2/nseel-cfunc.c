@@ -2,7 +2,7 @@
   Expression Evaluator Library (NS-EEL) v2
   Copyright (C) 2004-2008 Cockos Incorporated
   Copyright (C) 1999-2003 Nullsoft, Inc.
-  
+
   nseel-cfunc.c: assembly/C implementation of operator/function templates
   This file should be ideally compiled with optimizations towards "minimize size"
 
@@ -25,6 +25,7 @@
 
 
 #include "ns-eel-int.h"
+#include "ns-eel.h"
 #include <math.h>
 #include <stdio.h>
 
@@ -51,13 +52,13 @@ static unsigned int genrand_int32(void)
 
 
     if (!mti)
-    { 
+    {
       unsigned int s=0x4141f00d;
       mt[0]= s & 0xffffffffUL;
-      for (mti=1; mti<N; mti++) 
+      for (mti=1; mti<N; mti++)
       {
-          mt[mti] = 
-	      (1812433253UL * (mt[mti-1] ^ (mt[mti-1] >> 30)) + mti); 
+          mt[mti] =
+	      (1812433253UL * (mt[mti-1] ^ (mt[mti-1] >> 30)) + mti);
           /* See Knuth TAOCP Vol2. 3rd Ed. P.106 for multiplier. */
           /* In the previous versions, MSBs of the seed affect   */
           /* only MSBs of the array mt[].                        */
@@ -83,7 +84,7 @@ static unsigned int genrand_int32(void)
 
         mti = 0;
     }
-  
+
     y = mt[mti++];
 
     /* Tempering */
@@ -98,18 +99,20 @@ static unsigned int genrand_int32(void)
 
 
 //---------------------------------------------------------------------------------------------------------------
-EEL_F NSEEL_CGEN_CALL nseel_int_rand(EEL_F *f)
+/*
+EEL_F NSEEL_CGEN_CALL nseel_int_rand(EEL_F amplitude)
 {
-  EEL_F x=floor(*f);
+  EEL_F x=floor(amplitude);
   if (x < 1.0) x=1.0;
- 
-#ifdef NSEEL_EEL1_COMPAT_MODE 
+
+#ifdef NSEEL_EEL1_COMPAT_MODE
   return (EEL_F)(genrand_int32()%(int)x);
 #else
   return (EEL_F) (genrand_int32()*(1.0/(double)0xFFFFFFFF)*x);
 #endif
 //  return (EEL_F)(rand()%EEL_F2int(x));
 }
+*/
 
 //---------------------------------------------------------------------------------------------------------------
 
@@ -128,4 +131,3 @@ EEL_F NSEEL_CGEN_CALL nseel_int_rand(EEL_F *f)
   #include "asm-nseel-x86-gcc.c"
   #endif
 #endif
-
