@@ -63,6 +63,7 @@ struct IUnknown { virtual long Release() { return 0; }; };
 // More stubs for DirectX types
 typedef void* LPDIRECT3DBASETEXTURE9;
 typedef void* LPDIRECT3DTEXTURE9;
+typedef void* IDirect3DTexture9;
 typedef void* LPD3DXCONSTANTTABLE;
 typedef void* IDirect3DVertexShader9;
 typedef void* IDirect3DPixelShader9;
