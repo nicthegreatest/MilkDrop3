@@ -4,14 +4,14 @@ This file outlines the remaining tasks to complete the Linux port of MilkDrop3.
 
 ## Current Blocker
 
-The project is currently blocked from compiling due to a series of compilation and linker errors. The main issues are:
-
-- **Missing `y.tab.h`:** The `nseel-lextab.c` file is missing the `y.tab.h` header, which is a generated file from the `yacc` or `bison` parser generator. This file needs to be generated as part of the build process.
-- **Linker Errors:** The project is still experiencing linker errors related to multiple definitions and undefined references. This indicates that the `CMakeLists.txt` file still needs to be refined to correctly include all the necessary source files and to handle the dependencies between them.
+The project is currently blocked by a GLEW initialization error. The application compiles and runs, but displays a blank black screen. `glewInit()` fails with an "Unknown error", even with a valid OpenGL context. This prevents any OpenGL calls from succeeding.
 
 ## High Priority
 
+- **Fix GLEW Initialization:** The top priority is to resolve the GLEW initialization issue. This is likely an environment-specific problem, and may require further investigation into the interaction between GLFW, GLEW, and the OpenGL drivers.
+
 - **Port Rendering from DirectX to OpenGL:** This is the largest remaining task. The core rendering logic in `vis_milk2/` is still heavily dependent on DirectX 9.
+    - **Implement Basic Rendering:** The first step is to implement a basic rendering test to confirm that the OpenGL context is working correctly. This could be as simple as clearing the screen to a solid color.
     - **`plugin.cpp`:** This file contains the main rendering loop and DirectX API calls. It needs to be refactored to use OpenGL.
     - **`support.cpp`:** The helper functions for 3D math need to be re-implemented using an OpenGL-friendly math library like GLM.
     - **Shaders:** The DirectX HLSL shaders need to be ported to GLSL.

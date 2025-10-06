@@ -34,6 +34,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdio.h>
 #include <string.h>
 #include <wchar.h>
+#include <dirent.h>
 
 
 #define FRAND ((rand() % 7381)/7380.0f)
@@ -455,12 +456,31 @@ void CPlugin::UpdatePresetList(bool bBackground, bool bForce, bool bTryReselectC
     m_presets.clear();
     m_nPresets = 0;
     m_nDirs = 0;
-    PresetInfo p;
-    p.szFilename = "some_preset.milk";
-    p.fRatingThis = 3.0f;
-    p.fRatingCum = 3.0f;
-    m_presets.push_back(p);
-    m_nPresets = 1;
+
+    DIR *dir;
+    struct dirent *ent;
+    char preset_dir[1024];
+    sprintf(preset_dir, "%s%s", GetPluginsDirPath(), m_szPresetDir);
+
+    if ((dir = opendir(preset_dir)) != NULL) {
+        while ((ent = readdir(dir)) != NULL) {
+            if (strstr(ent->d_name, ".milk") != NULL) {
+                PresetInfo p;
+                p.szFilename = ent->d_name;
+                p.fRatingThis = 3.0f; // Default rating
+                p.fRatingCum = 3.0f;
+                m_presets.push_back(p);
+            }
+        }
+        closedir(dir);
+    } else {
+        // Could not open directory
+        char buf[1024];
+        sprintf(buf, "Could not open preset directory: %s", preset_dir);
+        dumpmsg(buf);
+    }
+
+    m_nPresets = m_presets.size();
     m_bPresetListReady = true;
 }
 void CPlugin::BuildMenus() { }

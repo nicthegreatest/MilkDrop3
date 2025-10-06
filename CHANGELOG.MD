@@ -2,6 +2,12 @@
 
 This file documents the major changes made to the MilkDrop3 codebase in the effort to port it to Linux.
 
+## Runtime and Rendering
+
+- **Fixed EGL Context Error:** Resolved a runtime error on Linux related to the EGL context by ensuring the OpenGL context is created and managed correctly.
+- **Implemented Preset Loading:** Replaced the stubbed `UpdatePresetList` function with a new implementation that scans the `presets` directory for `.milk` files.
+- **Added Presets:** Downloaded and added a collection of MilkDrop presets to the repository.
+
 ## Build System and Stubbing (In-Progress)
 
 - **Consolidated Windows/DirectX Types:** All Windows-specific type definitions (e.g., `DWORD`, `RECT`, `HWND`) have been moved to a central header, `shell_defines.h`, to resolve redefinition conflicts across the codebase.

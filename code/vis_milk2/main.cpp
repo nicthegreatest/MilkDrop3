@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <thread>
 #include <locale.h>
+#include "portaudio.h"
 
 #include "wasabi.h"
 #include "../audio/common.h"
@@ -60,18 +61,20 @@ int main(void)
     window = glfwCreateWindow(800, 600, "MilkDrop 3", NULL, NULL);
     if (!window)
     {
+        fprintf(stderr, "Failed to create GLFW window\n");
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
 
-    glfwSetKeyCallback(window, key_callback);
     glfwMakeContextCurrent(window);
-    glewExperimental = GL_TRUE;
-    if (glewInit() != GLEW_OK) {
-        fprintf(stderr, "Failed to initialize GLEW\n");
-        glfwTerminate();
-        exit(EXIT_FAILURE);
-    }
+    glfwSetKeyCallback(window, key_callback);
+
+    const GLubyte* renderer = glGetString(GL_RENDERER);
+    const GLubyte* version = glGetString(GL_VERSION);
+    printf("Renderer: %s\n", renderer);
+    printf("OpenGL version supported %s\n", version);
+
+    Pa_Initialize();
 
     g_plugin.PluginPreInitialize(0, 0);
     g_plugin.PluginInitialize(NULL, NULL, NULL, 800, 600);
@@ -89,6 +92,7 @@ int main(void)
     }
 
     g_plugin.PluginQuit();
+    Pa_Terminate();
     glfwDestroyWindow(window);
     glfwTerminate();
     exit(EXIT_SUCCESS);

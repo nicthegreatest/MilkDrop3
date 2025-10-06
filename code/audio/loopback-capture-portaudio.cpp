@@ -87,9 +87,6 @@ void LoopbackCaptureThreadFunction(LoopbackCaptureThreadFunctionArguments *pArgs
     }
     memset(data.recordedSamples, 0, numBytes);
 
-    err = Pa_Initialize();
-    if (err != paNoError) goto error;
-
     inputParameters.device = Pa_GetDefaultInputDevice();
     if (inputParameters.device == paNoDevice) {
         err = paNoDevice;
@@ -125,12 +122,10 @@ void LoopbackCaptureThreadFunction(LoopbackCaptureThreadFunctionArguments *pArgs
     err = Pa_CloseStream(stream);
     if (err != paNoError) goto error;
 
-    Pa_Terminate();
     free(data.recordedSamples);
     return;
 
 error:
-    Pa_Terminate();
     if (data.recordedSamples) {
         free(data.recordedSamples);
     }
