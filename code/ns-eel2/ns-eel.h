@@ -58,6 +58,11 @@ typedef uintptr_t UINT_PTR;
 #else
 #define NSEEL_CGEN_CALL 
 #endif
+
+#define EEL_F_SUFFIX "s"
+#define EEL_F_SSTR "4"
+#define NSEEL_LOOPFUNC_SUPPORT_MAXLEN_STR "1024"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -71,6 +76,7 @@ void NSEEL_HOSTSTUB_EnterMutex();
 void NSEEL_HOSTSTUB_LeaveMutex();
 typedef void *NSEEL_VMCTX;
 typedef void *NSEEL_CODEHANDLE;
+typedef float EEL_F;
 void NSEEL_start(); // Init global variables
 void NSEEL_quit(); // Delete global variables
 int32_t *NSEEL_getstats(); // returns a pointer to 5 ints... source bytes, static code bytes, call code bytes, data bytes, number of code handles

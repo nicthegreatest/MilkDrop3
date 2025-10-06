@@ -81,11 +81,7 @@ set(NSEEL_SOURCES
     ns-eel2/nseel-compiler.c
     ns-eel2/nseel-ram.c
     ns-eel2/y.tab.c
-    ns-eel2/nseel-lextab.c
-    ns-eel2/nseel-caltab.c
     ns-eel2/nseel-cfunc.c
-    ns-eel2/asm-nseel-x86-msvc.c
-    ns-eel2/asm-nseel-x86-gcc.c
 )
 
 # Find necessary libraries

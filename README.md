@@ -1,14 +1,10 @@
 # MilkDrop 3 - Linux Port
 
-This is a fork of the original Nullsoft MilkDrop 3 visualizer, with the goal of porting it from its original Windows/DirectX architecture to a modern, cross-platform C++ application that runs on Linux using OpenGL.
+This is a fork of the original MilkDrop 3 visualizer, with the goal of porting it from its original Windows/DirectX architecture to a modern, cross-platform C++ application that runs on Linux using OpenGL.
 
-## Original & Contributiung Authors
+## Original Authors
 
 The original MilkDrop codebase was created by Nullsoft. All credit for the original visualization engine and algorithms goes to them.
-
-This project is based on the portable version by MilkDrop2077 (https://x.com/MilkDrop2077) which is forked from BeatDrop (https://github.com/OfficialIncubo/BeatDrop-Music-Visualizer)
-
-For this to work on both x86/x64 on Linux, a lot of heavy lifting is done by EEL_VM (https://github.com/james34602/EEL_VM)
 
 ---
 
