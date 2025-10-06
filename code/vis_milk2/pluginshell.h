@@ -189,7 +189,7 @@ public:
     CPluginShell();
     ~CPluginShell();
     int  PluginPreInitialize(HWND hWinampWnd, HINSTANCE hWinampInstance);
-    int  PluginInitialize(LPDIRECT3DDEVICE9 device, void* d3dpp, HWND hwnd, int iWidth, int iHeight);
+    int  PluginInitialize(void* device, void* d3dpp, void* window, int iWidth, int iHeight);
     int  PluginRender(unsigned char *pWaveL, unsigned char *pWaveR);
     void PluginQuit();
     void ToggleHelp();
@@ -205,7 +205,7 @@ private:
     void DoTime();
     void AnalyzeNewSound(unsigned char *pWaveL, unsigned char *pWaveR);
     void AlignWaves();
-    int  InitDirectX(LPDIRECT3DDEVICE9 device, void* d3dpp, HWND hwnd);
+    int  InitDirectX(void* device, void* d3dpp, void* window);
     void CleanUpDirectX();
     int  InitGDIStuff();
     void CleanUpGDIStuff();
