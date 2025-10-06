@@ -89,8 +89,8 @@ public:
 					float min=0, float max=0, MilkMenuCallbackFnPtr pCallback=NULL,
                     unsigned int wParam=0, unsigned int lParam=0);
 	void	SetParentPointer(CMilkMenu *pParentMenu) { m_pParentMenu = pParentMenu; }
-	LRESULT HandleKeydown(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
-	void	DrawMenu(RECT rect, int xR, int yB, int bCalcRect=0, RECT* pCalcRect=NULL);
+	void	HandleKeydown(int key);
+	void	DrawMenu();
 	void	OnWaitStringAccept(char *szNewString);
     void    EnableItem(const char* szName, bool bEnable);
     CMilkMenuItem* GetCurItem()

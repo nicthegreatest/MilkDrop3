@@ -37,24 +37,6 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <assert.h>
 #include "resource.h"
 
-// Virtual-key codes
-#define VK_BACK           0x08
-#define VK_RETURN         0x0D
-#define VK_SHIFT          0x10
-#define VK_CONTROL        0x11
-#define VK_ESCAPE         0x1B
-#define VK_SPACE          0x20
-#define VK_PRIOR          0x21
-#define VK_NEXT           0x22
-#define VK_END            0x23
-#define VK_HOME           0x24
-#define VK_LEFT           0x25
-#define VK_UP             0x26
-#define VK_RIGHT          0x27
-#define VK_DOWN           0x28
-#define VK_INSERT         0x2D
-#define VK_DELETE         0x2E
-
 extern CPlugin *g_plugin;
 
 CMilkMenuItem::CMilkMenuItem()
@@ -198,12 +180,7 @@ void CMilkMenu::AddItem(const char *szName, void *var, MENUITEMTYPE type, const 
 	m_nChildItems++;
 }
 
-void MyMenuTextOut(eFontIndex font_index, const char* str, DWORD color, RECT* pRect, int bCalcRect, RECT* pCalcRect)
-{
-    // Stubbed out for now
-}
-
-void CMilkMenu::DrawMenu(RECT rect, int xR, int yB, int bCalcRect, RECT* pCalcRect)
+void CMilkMenu::DrawMenu()
 {
     // Stubbed out
 }
@@ -222,8 +199,7 @@ void CMilkMenu::OnWaitStringAccept(char *szNewString)
 	pItem->m_nLastCursorPos = g_plugin->m_waitstring.nCursorPos;
 }
 
-LRESULT CMilkMenu::HandleKeydown(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+void CMilkMenu::HandleKeydown(int key)
 {
     // Stubbed out - keyboard handling will be done in main loop
-    return 1;
 }

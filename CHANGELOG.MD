@@ -2,6 +2,11 @@
 
 This file documents the major changes made to the MilkDrop3 codebase in the effort to port it to Linux.
 
+## UI and Event Handling Refactoring
+- **Refactored `pluginshell` and `menu`:** Removed Windows-specific dependencies from the `pluginshell` and `menu` classes. This included removing types like `HWND`, `LRESULT`, `RECT`, and DirectX-specific types.
+- **Cross-Platform Input Handling:** Replaced the Windows-specific `MyWindowProc` function with a new `MyKeyHandler` virtual function that uses GLFW key codes, paving the way for cross-platform input handling.
+- **Consolidated Initialization:** Merged the `PluginPreInitialize` function into `PluginInitialize` to streamline the startup process and remove Windows-specific type dependencies (`HINSTANCE`).
+
 ## OpenGL Port and Rendering
 
 - **Core Rendering Pipeline Ported to OpenGL:** The core rendering pipeline has been ported from DirectX to OpenGL. This is a major milestone in the porting effort.
