@@ -4,16 +4,19 @@ This file outlines the remaining tasks to complete the Linux port of MilkDrop3.
 
 ## High Priority
 
-- **Debug Blank Screen Issue:** The application now compiles and runs, opening a window, but the screen is black. The next step is to debug the rendering pipeline to identify why nothing is being drawn. This will likely involve:
+- **Complete UI and Event Handling Port:** The initial refactoring of `pluginshell` and `menu` has removed the direct Windows API dependencies from the class definitions, but the work is incomplete. The next critical step is to fully implement the cross-platform UI and event handling.
+    - **Implement `MyKeyHandler` Call Site:** The main application loop in `main.cpp` must be updated to set up a GLFW key callback that calls the `MyKeyHandler` function on the `CPlugin` instance. This will reconnect keyboard input.
+    - **Implement Menu Logic:** The `HandleKeydown` function in `menu.cpp` needs to be implemented to process key events for menu navigation.
+    - **Implement Menu Rendering:** The `DrawMenu` function in `menu.cpp` must be implemented to render the menu using OpenGL, as the original GDI-based implementation has been removed.
+    - **Remove Remaining Stubs:** Any remaining UI-related stubs or placeholder functions should be fully implemented or removed.
+
+- **Debug Blank Screen Issue:** With the UI and event handling refactored, the primary focus can return to the blank screen issue. The goal is to get the visualizer to render correctly. This will likely involve:
     - Verifying that the vertex data is being passed to the shaders correctly.
     - Checking the shader compilation and linking for errors.
     - Ensuring that textures are being loaded and bound correctly.
     - Using `glGetError()` to check for OpenGL errors.
 
-- **Remove Windows API Dependencies:** Many files in `vis_milk2/` still use Windows API elements for UI and other functions. These need to be replaced with cross-platform alternatives (e.g., using GLFW for windowing and input) or removed.
-    - **`pluginshell.h` / `pluginshell.cpp`:** Contains the main window procedure (`WindowProc`) and handles Windows messages (e.g., `WM_KEYDOWN`). This needs to be completely refactored for a GLFW-based event loop.
-    - **`menu.h` / `menu.cpp`:** The menu system is based on the Windows API and needs to be replaced, possibly with a simple on-screen menu rendered with OpenGL.
-    - **Various types:** `RECT`, `LRESULT`, `CALLBACK`, `HWND`, `WPARAM`, `LPARAM` need to be removed.
+- **(Partially Complete) Remove Windows API Dependencies:** The core `pluginshell` and `menu` classes have been refactored to remove Windows-specific types from their public interfaces. However, other dependencies may remain elsewhere in the codebase.
 
 ## Medium Priority
 

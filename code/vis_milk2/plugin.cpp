@@ -430,9 +430,9 @@ void CPlugin::MyRenderFn(int redraw)
 void CPlugin::MyRenderUI(int *upper_left_corner_y, int *upper_right_corner_y, int *lower_left_corner_y, int *lower_right_corner_y, int xL, int xR)
 {
 }
-LRESULT CPlugin::MyWindowProc(HWND hWnd, unsigned uMsg, WPARAM wParam, LPARAM lParam)
+
+void CPlugin::MyKeyHandler(int key)
 {
-    return 1;
 }
 void CPlugin::GetSongTitle(char *szSongTitle, int nSize)
 {
@@ -523,7 +523,6 @@ void CPlugin::WaitString_SeekDownOneLine() {}
 void CPlugin::SavePresetAs(char *szNewFile) {}
 void CPlugin::DeletePresetFile(char *szDelFile) {}
 void CPlugin::RenamePresetFile(char *szOldFile, char *szNewFile) {}
-int CPlugin::HandleRegularKey(WPARAM wParam) { return 1; }
 void CPlugin::SeekToPreset(char cStartChar) {}
 void CPlugin::FindValidPresetDir() {}
 void CPlugin::MergeSortPresets(int left, int right) {}

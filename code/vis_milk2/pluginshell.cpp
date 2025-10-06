@@ -65,10 +65,6 @@ float     CPluginShell::GetFps()
 {
 	return m_fps;
 };
-HWND      CPluginShell::GetPluginWindow()
-{
-	if (m_lpDX) return (HWND)m_lpDX->GetWindow(); else return NULL;
-};
 int       CPluginShell::GetWidth()
 {
 	if (m_lpDX) return m_lpDX->m_client_width;  else return 0;
@@ -84,10 +80,6 @@ int       CPluginShell::GetCanvasMarginX()
 int       CPluginShell::GetCanvasMarginY()
 {
 	if (m_lpDX) return (m_lpDX->m_client_height - m_lpDX->m_REAL_client_height)/2; else return 0;
-};
-HINSTANCE CPluginShell::GetInstance()
-{
-	return m_hInstance;
 };
 char* CPluginShell::GetPluginsDirPath()
 {
@@ -108,26 +100,6 @@ int       CPluginShell::GetFontHeight(eFontIndex idx)
 int       CPluginShell::GetBitDepth()
 {
 	if (m_lpDX) return m_lpDX->GetBitDepth(); else return 0;
-};
-LPDIRECT3DDEVICE9 CPluginShell::GetDevice()
-{
-	return NULL;
-};
-D3DCAPS9* CPluginShell::GetCaps()
-{
-	return NULL;
-};
-D3DFORMAT CPluginShell::GetBackBufFormat()
-{
-	return (D3DFORMAT)0;
-};
-D3DFORMAT CPluginShell::GetBackBufZFormat()
-{
-	return (D3DFORMAT)0;
-};
-LPD3DXFONT CPluginShell::GetFont(eFontIndex idx)
-{
-	return NULL;
 };
 char* CPluginShell::GetDriverFilename()
 {
@@ -239,7 +211,7 @@ void CPluginShell::CleanUpDirectX()
 	SafeDelete(m_lpDX);
 }
 
-int CPluginShell::PluginPreInitialize(HWND hWinampWnd, HINSTANCE hWinampInstance)
+int CPluginShell::PluginInitialize(void* device, void* d3dpp, void* window, int iWidth, int iHeight)
 {
 	m_start_fullscreen      = 0;
 	m_start_desktop         = 0;
@@ -290,7 +262,6 @@ int CPluginShell::PluginPreInitialize(HWND hWinampWnd, HINSTANCE hWinampInstance
 	m_frame = 0;
 	m_time = 0;
 	m_fps = 60;
-	m_hInstance = hWinampInstance;
 	m_lpDX = NULL;
 
     strcpy(m_szPluginsDirPath, "./");
@@ -337,11 +308,7 @@ int CPluginShell::PluginPreInitialize(HWND hWinampWnd, HINSTANCE hWinampInstance
 	ReadConfig();
 	MyPreInitialize();
 	MyReadConfig();
-	return TRUE;
-}
 
-int CPluginShell::PluginInitialize(void* device, void* d3dpp, void* window, int iWidth, int iHeight)
-{
     if (!InitDirectX(device, d3dpp, window)) return false;
     m_lpDX->m_client_width = iWidth;
     m_lpDX->m_client_height = iHeight;
@@ -477,11 +444,6 @@ void CPluginShell::AlignWaves()
     // Simplified for now
 	memcpy(m_oldwave[0], m_sound.fWaveform[0], sizeof(float)*576);
 	memcpy(m_oldwave[1], m_sound.fWaveform[1], sizeof(float)*576);
-}
-
-LRESULT CPluginShell::PluginShellWindowProc(HWND hWnd, unsigned uMsg, WPARAM wParam, LPARAM lParam)
-{
-	return MyWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
 void CPluginShell::ToggleHelp()

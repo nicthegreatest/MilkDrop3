@@ -70,23 +70,16 @@ public:
     int       GetFrame();
     float     GetTime();
     float     GetFps();
-    HINSTANCE GetInstance();
     char*  GetPluginsDirPath();
     char*  GetConfigIniFile();
 	char*     GetConfigIniFileA();
 protected:
-    HWND         GetPluginWindow();
     int          GetWidth();
     int          GetHeight();
     int          GetBitDepth();
-    LPDIRECT3DDEVICE9  GetDevice();
-    D3DCAPS9*    GetCaps();
-    D3DFORMAT    GetBackBufFormat();
-    D3DFORMAT    GetBackBufZFormat();
     char*        GetDriverFilename();
     char*        GetDriverDescription();
 public:
-    LPD3DXFONT   GetFont(eFontIndex idx);
     int          GetFontHeight(eFontIndex idx);
     CTextManager m_text;
 protected:
@@ -127,7 +120,7 @@ protected:
     virtual void  CleanUpMyDX9Stuff(int final_cleanup) = 0;
     virtual void MyRenderFn(int redraw)  = 0;
     virtual void MyRenderUI(int *upper_left_corner_y, int *upper_right_corner_y, int *lower_left_corner_y, int *lower_right_corner_y, int xL, int xR) = 0;
-    virtual LRESULT MyWindowProc(HWND hWnd, unsigned uMsg, WPARAM wParam, LPARAM lParam) = 0;
+    virtual void MyKeyHandler(int key) = 0;
     virtual void OnAltK() { };
 
     int m_show_help;
@@ -135,7 +128,6 @@ private:
     int          m_frame;
     float        m_time;
     float        m_fps;
-    HINSTANCE    m_hInstance;
     GLContext*   m_lpDX;
     char      m_szPluginsDirPath[260];
     char      m_szConfigIniFile[260];
@@ -188,16 +180,12 @@ private:
 public:
     CPluginShell();
     ~CPluginShell();
-    int  PluginPreInitialize(HWND hWinampWnd, HINSTANCE hWinampInstance);
     int  PluginInitialize(void* device, void* d3dpp, void* window, int iWidth, int iHeight);
     int  PluginRender(unsigned char *pWaveL, unsigned char *pWaveR);
     void PluginQuit();
     void ToggleHelp();
 	void READ_FONT(int n);
 	void WRITE_FONT(int n);
-    static LRESULT WindowProc(HWND hWnd, unsigned uMsg, WPARAM wParam, LPARAM lParam);
-    static LRESULT DesktopWndProc(HWND hWnd, unsigned uMsg, WPARAM wParam, LPARAM lParam);
-    static LRESULT VJModeWndProc(HWND hWnd, unsigned uMsg, WPARAM wParam, LPARAM lParam);
 private:
     void DrawAndDisplay(int redraw);
     void ReadConfig();
@@ -241,10 +229,6 @@ protected:
 	  bool		m_bTextWindowClassRegistered;
       void* m_vjd3d9; // LPDIRECT3D9
       void* m_vjd3d9_device; // LPDIRECT3DDEVICE9
-public:
-    LRESULT PluginShellWindowProc(HWND hWnd, unsigned uMsg, WPARAM wParam, LPARAM lParam);
-    LRESULT PluginShellDesktopWndProc(HWND hWnd, unsigned uMsg, WPARAM wParam, LPARAM lParam);
-    LRESULT PluginShellVJModeWndProc(HWND hWnd, unsigned uMsg, WPARAM wParam, LPARAM lParam);
 };
 
 #endif
