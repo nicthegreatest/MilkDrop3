@@ -44,7 +44,7 @@ static bool m_bAlwaysOnTop = false;
 void NSEEL_HOSTSTUB_EnterMutex(){}
 void NSEEL_HOSTSTUB_LeaveMutex(){}
 
-CPlugin g_plugin;
+CPlugin* g_plugin = nullptr;
 
 // from support.cpp:
 extern bool g_bDebugOutput;
@@ -131,14 +131,14 @@ void StripComments(char *str)
 bool ReadFileToString(const char* szBaseFilename, char* szDestText, int nMaxBytes, bool bConvertLFsToSpecialChar)
 {
     char szFile[260];
-    sprintf(szFile, "%s%s", g_plugin.GetPluginsDirPath(), szBaseFilename);
+    sprintf(szFile, "%s%s", g_plugin->GetPluginsDirPath(), szBaseFilename);
 
     FILE* f = fopen(szFile, "rb");
     if (!f)
     {
         char buf[1024];
 		sprintf(buf, "Unable to read data file: %s", szFile);
-		g_plugin.dumpmsg(buf);
+		g_plugin->dumpmsg(buf);
 		return false;
     }
     int len = 0;
@@ -172,13 +172,13 @@ bool ReadFileToString(const char* szBaseFilename, char* szDestText, int nMaxByte
     return true;
 }
 
-void OnUserEditedPerFrame(LPARAM param1, LPARAM param2) { g_plugin.m_pState->RecompileExpressions(RECOMPILE_PRESET_CODE, 0); }
-void OnUserEditedPerPixel(LPARAM param1, LPARAM param2) { g_plugin.m_pState->RecompileExpressions(RECOMPILE_PRESET_CODE, 0); }
-void OnUserEditedPresetInit(LPARAM param1, LPARAM param2) { g_plugin.m_pState->RecompileExpressions(RECOMPILE_PRESET_CODE, 1); }
-void OnUserEditedWavecode(LPARAM param1, LPARAM param2) { g_plugin.m_pState->RecompileExpressions(RECOMPILE_WAVE_CODE, 0); }
-void OnUserEditedWavecodeInit(LPARAM param1, LPARAM param2) { g_plugin.m_pState->RecompileExpressions(RECOMPILE_WAVE_CODE, 1); }
-void OnUserEditedShapecode(LPARAM param1, LPARAM param2) { g_plugin.m_pState->RecompileExpressions(RECOMPILE_SHAPE_CODE, 0); }
-void OnUserEditedShapecodeInit(LPARAM param1, LPARAM param2) { g_plugin.m_pState->RecompileExpressions(RECOMPILE_SHAPE_CODE, 1); }
+void OnUserEditedPerFrame(LPARAM param1, LPARAM param2) { g_plugin->m_pState->RecompileExpressions(RECOMPILE_PRESET_CODE, 0); }
+void OnUserEditedPerPixel(LPARAM param1, LPARAM param2) { g_plugin->m_pState->RecompileExpressions(RECOMPILE_PRESET_CODE, 0); }
+void OnUserEditedPresetInit(LPARAM param1, LPARAM param2) { g_plugin->m_pState->RecompileExpressions(RECOMPILE_PRESET_CODE, 1); }
+void OnUserEditedWavecode(LPARAM param1, LPARAM param2) { g_plugin->m_pState->RecompileExpressions(RECOMPILE_WAVE_CODE, 0); }
+void OnUserEditedWavecodeInit(LPARAM param1, LPARAM param2) { g_plugin->m_pState->RecompileExpressions(RECOMPILE_WAVE_CODE, 1); }
+void OnUserEditedShapecode(LPARAM param1, LPARAM param2) { g_plugin->m_pState->RecompileExpressions(RECOMPILE_SHAPE_CODE, 0); }
+void OnUserEditedShapecodeInit(LPARAM param1, LPARAM param2) { g_plugin->m_pState->RecompileExpressions(RECOMPILE_SHAPE_CODE, 1); }
 void OnUserEditedWarpShaders(LPARAM param1, LPARAM param2) { /* Stub */ }
 void OnUserEditedCompShaders(LPARAM param1, LPARAM param2) { /* Stub */ }
 

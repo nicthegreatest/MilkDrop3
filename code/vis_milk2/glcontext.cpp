@@ -61,8 +61,7 @@ bool GLContext::Internal_Init(GLCONTEXT_PARAMS *pParams, bool bFirstInit)
     memcpy(&m_current_mode, pParams, sizeof(GLCONTEXT_PARAMS));
 
     glfwMakeContextCurrent(m_window);
-    glewExperimental = GL_TRUE;
-    if (glewInit() != GLEW_OK) {
+    if (!gladLoadGL((GLADloadfunc)glfwGetProcAddress)) {
         // handle error
         return false;
     }

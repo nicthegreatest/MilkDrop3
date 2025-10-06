@@ -31,7 +31,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __NULLSOFT_GL_PLUGIN_SHELL_GLCONTEXT_H__ 1
 
 #include "shell_defines.h"
-#include <GL/glew.h>
+#include "glad.h"
 #include <GLFW/glfw3.h>
 
 typedef struct

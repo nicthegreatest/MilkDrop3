@@ -39,7 +39,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <assert.h>
 #include "wasabi.h"
 
-extern CPlugin g_plugin;		// declared in main.cpp
+extern CPlugin *g_plugin;		// declared in main.cpp
 
 #define FRAND ((rand() % 7381)/7380.0f)
 
@@ -1369,7 +1369,7 @@ bool CState::Import(const char *szIniFile, float fTime, CState* pOldState, DWORD
         char buf[] = "warp_";
         ReadCode(f, m_szWarpShadersText, buf);
         if (!m_szWarpShadersText[0])
-            g_plugin.GenWarpPShaderText(m_szWarpShadersText, m_fDecay.eval(-1), m_bTexWrap);
+            g_plugin->GenWarpPShaderText(m_szWarpShadersText, m_fDecay.eval(-1), m_bTexWrap);
         m_nWarpPSVersion = nWarpPSVersionInFile;
     }
 
@@ -1380,7 +1380,7 @@ bool CState::Import(const char *szIniFile, float fTime, CState* pOldState, DWORD
         char buf[] = "comp_";
         ReadCode(f, m_szCompShadersText, buf);
         if (!m_szCompShadersText[0])
-            g_plugin.GenCompPShaderText(m_szCompShadersText, m_fGammaAdj.eval(-1), m_fVideoEchoAlpha.eval(-1), m_fVideoEchoZoom.eval(-1), m_nVideoEchoOrientation, m_fShader.eval(-1), m_bBrighten, m_bDarken, m_bSolarize, m_bInvert);
+            g_plugin->GenCompPShaderText(m_szCompShadersText, m_fGammaAdj.eval(-1), m_fVideoEchoAlpha.eval(-1), m_fVideoEchoZoom.eval(-1), m_nVideoEchoOrientation, m_fShader.eval(-1), m_bBrighten, m_bDarken, m_bSolarize, m_bInvert);
         m_nCompPSVersion = nCompPSVersionInFile;
     }
 
@@ -1398,12 +1398,12 @@ bool CState::Import(const char *szIniFile, float fTime, CState* pOldState, DWORD
 void CState::GenDefaultWarpShader()
 {
     if (m_nWarpPSVersion>0)
-        g_plugin.GenWarpPShaderText(m_szWarpShadersText, m_fDecay.eval(-1), m_bTexWrap);
+        g_plugin->GenWarpPShaderText(m_szWarpShadersText, m_fDecay.eval(-1), m_bTexWrap);
 }
 void CState::GenDefaultCompShader()
 {
     if (m_nCompPSVersion>0)
-        g_plugin.GenCompPShaderText(m_szCompShadersText, m_fGammaAdj.eval(-1), m_fVideoEchoAlpha.eval(-1), m_fVideoEchoZoom.eval(-1), m_nVideoEchoOrientation, m_fShader.eval(-1), m_bBrighten, m_bDarken, m_bSolarize, m_bInvert);
+        g_plugin->GenCompPShaderText(m_szCompShadersText, m_fGammaAdj.eval(-1), m_fVideoEchoAlpha.eval(-1), m_fVideoEchoZoom.eval(-1), m_nVideoEchoOrientation, m_fShader.eval(-1), m_bBrighten, m_bDarken, m_bSolarize, m_bInvert);
 }
 
 void CState::FreeVarsAndCode(bool bFree)
@@ -1594,7 +1594,7 @@ void CState::RecompileExpressions(int flags, int bReInit)
 	#ifndef _NO_EXPR_
     {
 	// clear any old error msg.:
-	//g_plugin.m_fShowUserMessageUntilThisTime = g_plugin.GetTime();
+	//g_plugin->m_fShowUserMessageUntilThisTime = g_plugin->GetTime();
 
 	    char buf[MAX_BIGSTRING_LEN*3];
 
@@ -1610,7 +1610,7 @@ void CState::RecompileExpressions(int flags, int bReInit)
 			    {
                     char buf[1024];
 				    sprintf(buf, wasabiApiLangString(IDS_WARNING_PRESET_X_ERROR_IN_PRESET_INIT_CODE), m_szDesc);
-                    g_plugin.AddError(buf, 6.0f, ERR_PRESET, true);
+                    g_plugin->AddError(buf, 6.0f, ERR_PRESET, true);
 
                     for (int vi=0; vi<NUM_Q_VAR; vi++)
 				        q_values_after_init_code[vi] = 0;
@@ -1620,7 +1620,7 @@ void CState::RecompileExpressions(int flags, int bReInit)
 			    {
 				    // now execute the code, save the values of q1..q32, and clean up the code!
 
-                    g_plugin.LoadPerFrameEvallibVars(g_plugin.m_pState);
+                    g_plugin->LoadPerFrameEvallibVars(g_plugin->m_pState);
 
 				    NSEEL_code_execute(pf_codehandle_init);
 
@@ -1641,7 +1641,7 @@ void CState::RecompileExpressions(int flags, int bReInit)
 			    {
                     char buf[1024];
 				    sprintf(buf, wasabiApiLangString(IDS_WARNING_PRESET_X_ERROR_IN_PER_FRAME_CODE), m_szDesc);
-                    g_plugin.AddError(buf, 6.0f, ERR_PRESET, true);
+                    g_plugin->AddError(buf, 6.0f, ERR_PRESET, true);
 			    }
 	        }
 
@@ -1653,7 +1653,7 @@ void CState::RecompileExpressions(int flags, int bReInit)
 			    {
                     char buf[1024];
 				    sprintf(buf, wasabiApiLangString(IDS_WARNING_PRESET_X_ERROR_IN_PER_VERTEX_CODE), m_szDesc);
-                    g_plugin.AddError(buf, 6.0f, ERR_PRESET, true);
+                    g_plugin->AddError(buf, 6.0f, ERR_PRESET, true);
 			    }
 	        }
 
@@ -1675,7 +1675,7 @@ void CState::RecompileExpressions(int flags, int bReInit)
 			            {
                             char buf[1024];
 				            sprintf(buf, wasabiApiLangString(IDS_WARNING_PRESET_X_ERROR_IN_WAVE_X_INIT_CODE), m_szDesc, i);
-                            g_plugin.AddError(buf, 6.0f, ERR_PRESET, true);
+                            g_plugin->AddError(buf, 6.0f, ERR_PRESET, true);
 
                             for (int vi=0; vi<NUM_Q_VAR; vi++)
                                 *m_wave[i].var_pf_q[vi] = q_values_after_init_code[vi];
@@ -1686,7 +1686,7 @@ void CState::RecompileExpressions(int flags, int bReInit)
 			            {
 				            // now execute the code, save the values of t1..t8, and clean up the code!
 
-                            g_plugin.LoadCustomWavePerFrameEvallibVars(g_plugin.m_pState, i);
+                            g_plugin->LoadCustomWavePerFrameEvallibVars(g_plugin->m_pState, i);
                                 // note: q values at this point will actually be same as
                                 //       q_values_after_init_code[], since no per-frame code
                                 //       has actually been executed yet!
@@ -1712,7 +1712,7 @@ void CState::RecompileExpressions(int flags, int bReInit)
 			            {
                             char buf[1024];
 				            sprintf(buf, wasabiApiLangString(IDS_WARNING_PRESET_X_ERROR_IN_WAVE_X_PER_FRAME_CODE), m_szDesc, i);
-                            g_plugin.AddError(buf, 6.0f, ERR_PRESET, true);
+                            g_plugin->AddError(buf, 6.0f, ERR_PRESET, true);
 			            }
                     #endif
                 }
@@ -1725,7 +1725,7 @@ void CState::RecompileExpressions(int flags, int bReInit)
 			        {
                         char buf[1024];
 				        sprintf(buf, wasabiApiLangString(IDS_WARNING_PRESET_X_ERROR_IN_WAVE_X_PER_POINT_CODE), m_szDesc, i);
-                        g_plugin.AddError(buf, 6.0f, ERR_PRESET, true);
+                        g_plugin->AddError(buf, 6.0f, ERR_PRESET, true);
 			        }
                 }
             }
@@ -1746,7 +1746,7 @@ void CState::RecompileExpressions(int flags, int bReInit)
 			            {
                             char buf[1024];
 				            sprintf(buf, wasabiApiLangString(IDS_WARNING_PRESET_X_ERROR_IN_SHAPE_X_INIT_CODE), m_szDesc, i);
-                            g_plugin.AddError(buf, 6.0f, ERR_PRESET, true);
+                            g_plugin->AddError(buf, 6.0f, ERR_PRESET, true);
 
                             for (int vi=0; vi<NUM_Q_VAR; vi++)
                                 *m_shape[i].var_pf_q[vi] = q_values_after_init_code[vi];
@@ -1757,7 +1757,7 @@ void CState::RecompileExpressions(int flags, int bReInit)
 			            {
 				            // now execute the code, save the values of q1..q8, and clean up the code!
 
-                            g_plugin.LoadCustomShapePerFrameEvallibVars(g_plugin.m_pState, i, 0);
+                            g_plugin->LoadCustomShapePerFrameEvallibVars(g_plugin->m_pState, i, 0);
                                 // note: q values at this point will actually be same as
                                 //       q_values_after_init_code[], since no per-frame code
                                 //       has actually been executed yet!
@@ -1783,7 +1783,7 @@ void CState::RecompileExpressions(int flags, int bReInit)
 			            {
                             char buf[1024];
 				            sprintf(buf, wasabiApiLangString(IDS_WARNING_PRESET_X_ERROR_IN_SHAPE_X_PER_FRAME_CODE), m_szDesc, i);
-                            g_plugin.AddError(buf, 6.0f, ERR_PRESET, true);
+                            g_plugin->AddError(buf, 6.0f, ERR_PRESET, true);
 			            }
 		            #endif
                 }
