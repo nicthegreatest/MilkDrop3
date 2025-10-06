@@ -55,7 +55,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VK_INSERT         0x2D
 #define VK_DELETE         0x2E
 
-extern CPlugin g_plugin;
+extern CPlugin *g_plugin;
 
 CMilkMenuItem::CMilkMenuItem()
 {
@@ -183,7 +183,7 @@ void CMilkMenu::AddItem(const char *szName, void *var, MENUITEMTYPE type, const 
 	}
 	strncpy(pLastItem->m_szName, szName, 64);
 	strncpy(pLastItem->m_szToolTip, szToolTip, 1024);
-	pLastItem->m_var_offset = (size_t)var - (size_t)(g_plugin.m_pState);
+	pLastItem->m_var_offset = (size_t)var - (size_t)(g_plugin->m_pState);
 	pLastItem->m_type = type;
 	pLastItem->m_fMin = min;
 	pLastItem->m_fMax = max;
@@ -212,14 +212,14 @@ void CMilkMenu::OnWaitStringAccept(char *szNewString)
 {
 	m_bEditingCurSel = false;
 	CMilkMenuItem *pItem = GetCurItem();
-	size_t addr = pItem->m_var_offset + (size_t)g_plugin.m_pState;
+	size_t addr = pItem->m_var_offset + (size_t)g_plugin->m_pState;
 	assert(pItem->m_type == MENUITEMTYPE_STRING);
 	strcpy((char *)(addr), szNewString);
 	if (pItem->m_pCallbackFn)
 	{
 		pItem->m_pCallbackFn(0, 0);
 	}
-	pItem->m_nLastCursorPos = g_plugin.m_waitstring.nCursorPos;
+	pItem->m_nLastCursorPos = g_plugin->m_waitstring.nCursorPos;
 }
 
 LRESULT CMilkMenu::HandleKeydown(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)

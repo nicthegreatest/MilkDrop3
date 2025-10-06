@@ -1,5 +1,5 @@
 #include "plugin.h"
-#include <GL/glew.h>
+#include "glad.h"
 #include <GLFW/glfw3.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,7 +11,7 @@
 #include "../audio/common.h"
 #include "../audio/loopback-capture.h"
 
-extern CPlugin g_plugin;
+extern CPlugin* g_plugin;
 locale_t g_use_C_locale;
 
 #define SAMPLE_SIZE 576
@@ -33,20 +33,22 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
     if (action == GLFW_PRESS || action == GLFW_REPEAT)
     {
         // This is a simplified mapping. A more robust solution would be needed for full compatibility.
-        g_plugin.PluginShellWindowProc(NULL, WM_KEYDOWN, key, 0);
+        g_plugin->PluginShellWindowProc(NULL, WM_KEYDOWN, key, 0);
     }
 }
 
 void RenderFrame() {
     GetAudioBuf(pcmLeftIn, pcmRightIn, SAMPLE_SIZE);
 
-    g_plugin.PluginRender(
+    g_plugin->PluginRender(
         (unsigned char*) pcmLeftOut,
         (unsigned char*) pcmRightOut);
 }
 
 int main(void)
 {
+    g_plugin = new CPlugin();
+
     GLFWwindow* window;
 
     glfwSetErrorCallback(error_callback);
@@ -76,8 +78,8 @@ int main(void)
 
     Pa_Initialize();
 
-    g_plugin.PluginPreInitialize(0, 0);
-    g_plugin.PluginInitialize(NULL, NULL, NULL, 800, 600);
+    g_plugin->PluginPreInitialize(0, 0);
+    g_plugin->PluginInitialize(NULL, NULL, NULL, 800, 600);
 
     // Start the audio capture thread
     g_audio_thread_args.hr = 0;
@@ -91,9 +93,13 @@ int main(void)
         glfwPollEvents();
     }
 
-    g_plugin.PluginQuit();
+    g_plugin->PluginQuit();
     Pa_Terminate();
     glfwDestroyWindow(window);
     glfwTerminate();
+
+    delete g_plugin;
+    g_plugin = nullptr;
+
     exit(EXIT_SUCCESS);
 }

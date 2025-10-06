@@ -2,6 +2,11 @@
 
 This file documents the major changes made to the MilkDrop3 codebase in the effort to port it to Linux.
 
+## Rendering and Core
+
+- **Replaced GLEW with GLAD:** The GLEW library, which was causing intractable initialization errors, has been replaced with GLAD. This involved generating the GLAD loader, updating the build system, and modifying the code to use the new library.
+- **Fixed Stack Overflow:** Resolved a segmentation fault caused by a stack overflow on startup. The `g_plugin` global object, which is very large, is now dynamically allocated on the heap instead of the stack.
+
 ## Runtime and Rendering
 
 - **Fixed EGL Context Error:** Resolved a runtime error on Linux related to the EGL context by ensuring the OpenGL context is created and managed correctly.

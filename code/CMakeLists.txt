@@ -89,7 +89,6 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(PORTAUDIO REQUIRED portaudio-2.0)
 
 find_package(OpenGL REQUIRED)
-find_package(GLEW REQUIRED)
 find_package(glfw3 REQUIRED)
 
 set(VIS_MILK2_SOURCES
@@ -106,6 +105,7 @@ set(VIS_MILK2_SOURCES
     vis_milk2/textmgr.cpp
     vis_milk2/utility.cpp
     vis_milk2/wasabi.cpp
+    vis_milk2/glad.c
 )
 
 # Add executable
@@ -122,7 +122,6 @@ target_include_directories(milkdrop3 PUBLIC
     "${PROJECT_SOURCE_DIR}/vis_milk2"
     "${PROJECT_SOURCE_DIR}/ns-eel2/numericSys/HPFloat"
     ${OPENGL_INCLUDE_DIR}
-    ${GLEW_INCLUDE_DIRS}
     ${glfw3_INCLUDE_DIRS}
     ${PORTAUDIO_INCLUDE_DIRS}
 )
@@ -130,7 +129,6 @@ target_include_directories(milkdrop3 PUBLIC
 # Link libraries
 target_link_libraries(milkdrop3
     ${OPENGL_LIBRARIES}
-    ${GLEW_LIBRARIES}
     glfw
     ${PORTAUDIO_LIBRARIES}
 )

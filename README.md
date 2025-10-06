@@ -12,15 +12,11 @@ The original MilkDrop codebase was created by Nullsoft. All credit for the origi
 
 This project is currently undergoing a significant refactoring effort to port the original Windows/DirectX codebase to a modern, cross-platform C++ application that can be compiled and run on Linux using OpenGL.
 
-The porting process is ongoing. The application currently compiles and runs, but displays a **blank black screen**.
+The porting process is ongoing. The application now compiles and is capable of running, though it is not yet fully stable.
 
 For a detailed list of the major changes that have been completed, see [CHANGELOG.MD](CHANGELOG.MD).
 
 For a list of the remaining tasks required to get the project running, see [TODO.MD](TODO.MD).
-
-### Current Issue: Blank Screen
-
-The main blocker is an issue with the OpenGL rendering context. Although the application creates a window, it fails to render any content, resulting in a black screen. This is due to an issue with GLEW initialization, which is preventing any OpenGL calls from succeeding.
 
 ## Building and Running
 
@@ -31,21 +27,20 @@ The main blocker is an issue with the OpenGL rendering context. Although the app
 - Git
 - The following development libraries:
     - `glfw3`
-    - `glew`
     - `portaudio-2.0`
     - `opengl`
 
 ### Building
 
 1.  Clone the repository.
-2.  Create a build directory: `mkdir code/build`
-3.  Navigate to the build directory: `cd code/build`
-4.  Run CMake: `cmake ..`
+2.  Create a build directory: `mkdir build`
+3.  Navigate to the build directory: `cd build`
+4.  Run CMake: `cmake ../code`
 5.  Run Make: `make`
 
 ### Running
 
-After a successful build, the executable will be located at `code/build/milkdrop3`. Run it from the `code/build` directory:
+After a successful build, the executable will be located at `build/milkdrop3`. Run it from the `build` directory:
 
 ```
 ./milkdrop3

@@ -2,13 +2,7 @@
 
 This file outlines the remaining tasks to complete the Linux port of MilkDrop3.
 
-## Current Blocker
-
-The project is currently blocked by a GLEW initialization error. The application compiles and runs, but displays a blank black screen. `glewInit()` fails with an "Unknown error", even with a valid OpenGL context. This prevents any OpenGL calls from succeeding.
-
 ## High Priority
-
-- **Fix GLEW Initialization:** The top priority is to resolve the GLEW initialization issue. This is likely an environment-specific problem, and may require further investigation into the interaction between GLFW, GLEW, and the OpenGL drivers.
 
 - **Port Rendering from DirectX to OpenGL:** This is the largest remaining task. The core rendering logic in `vis_milk2/` is still heavily dependent on DirectX 9.
     - **Implement Basic Rendering:** The first step is to implement a basic rendering test to confirm that the OpenGL context is working correctly. This could be as simple as clearing the screen to a solid color.
