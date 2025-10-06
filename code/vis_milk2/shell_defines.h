@@ -31,22 +31,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __NULLSOFT_DX9_PLUGIN_SHELL_SHELL_DEFINES_H__ 1
 
 #include <cstdint>
-#include <string.h> // for memset
 
-// Stubs for Windows types
-struct HWND__; typedef HWND__* HWND;
-struct HINSTANCE__; typedef HINSTANCE__* HINSTANCE;
-struct HFONT__; typedef HFONT__* HFONT;
-typedef void* LPD3DXFONT;
-typedef void* LPDIRECT3DDEVICE9;
-struct D3DCAPS9 {
-    uint32_t MaxPrimitiveCount;
-    uint32_t SrcBlendCaps;
-    uint32_t DestBlendCaps;
-};
-enum D3DFORMAT {};
-struct RECT { long left, top, right, bottom; };
-struct GUID { uint32_t Data1; uint16_t Data2; uint16_t Data3; uint8_t Data4[8]; };
+// Common types for all platforms
 typedef uint32_t DWORD;
 typedef uint16_t USHORT;
 typedef uint16_t WORD;
@@ -56,8 +42,23 @@ typedef intptr_t LRESULT;
 typedef uintptr_t UINT_PTR;
 typedef UINT_PTR WPARAM;
 typedef LONG_PTR LPARAM;
+
+#ifdef _WIN32
+#include <windows.h>
+#include <process.h>
+#include <d3d9.h>
+#include <d3dx9.h>
+#else
+#include "dx_on_gl.h"
+// Stubs for Windows types
+struct HWND__; typedef HWND__* HWND;
+struct HINSTANCE__; typedef HINSTANCE__* HINSTANCE;
+struct HFONT__; typedef HFONT__* HFONT;
+struct RECT { long left, top, right, bottom; };
+struct GUID { uint32_t Data1; uint16_t Data2; uint16_t Data3; uint8_t Data4[8]; };
 typedef void* LPVOID;
 struct IUnknown { virtual long Release() { return 0; }; };
+#endif
 
 
 // More stubs for DirectX types
