@@ -12,7 +12,7 @@ The original MilkDrop codebase was created by Nullsoft. All credit for the origi
 
 This project is currently undergoing a significant refactoring effort to port the original Windows/DirectX codebase to a modern, cross-platform C++ application that can be compiled and run on Linux using OpenGL.
 
-The porting process is ongoing. The application now compiles and is capable of running, though it is not yet fully stable.
+The application now compiles and runs, opening a window. However, the screen is currently black, and the rendering pipeline is being actively debugged.
 
 For a detailed list of the major changes that have been completed, see [CHANGELOG.MD](CHANGELOG.MD).
 

@@ -40,6 +40,10 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "../ns-eel2/ns-eel.h"
 #include <string>
 
+class CPlugin;
+extern CPlugin* g_plugin;
+
+
 //#include <core/sdk/IPlaybackService.h>
 
 extern "C" int (*warand)(void);
@@ -273,6 +277,7 @@ typedef std::vector<PresetInfo> PresetList;
 class CPlugin : public CPluginShell
 {
 public:
+    CPlugin();
 
     //====[ 1. members added to create this specific example plugin: ]================================================
 

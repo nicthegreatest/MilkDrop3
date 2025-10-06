@@ -11,7 +11,7 @@
 #include "../audio/common.h"
 #include "../audio/loopback-capture.h"
 
-extern CPlugin g_plugin;
+extern CPlugin* g_plugin;
 locale_t g_use_C_locale;
 
 #define SAMPLE_SIZE 576
@@ -33,26 +33,33 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
     if (action == GLFW_PRESS || action == GLFW_REPEAT)
     {
         // This is a simplified mapping. A more robust solution would be needed for full compatibility.
-        g_plugin.PluginShellWindowProc(NULL, WM_KEYDOWN, key, 0);
+        g_plugin->PluginShellWindowProc(NULL, WM_KEYDOWN, key, 0);
     }
 }
 
 void RenderFrame() {
     GetAudioBuf(pcmLeftIn, pcmRightIn, SAMPLE_SIZE);
 
-    g_plugin.PluginRender(
+    g_plugin->PluginRender(
         (unsigned char*) pcmLeftOut,
         (unsigned char*) pcmRightOut);
 }
 
 int main(void)
 {
+    printf("main: starting\n");
     GLFWwindow* window;
+
+    g_plugin = new CPlugin();
 
     glfwSetErrorCallback(error_callback);
 
     if (!glfwInit())
+    {
+        printf("main: glfwInit() failed\n");
         exit(EXIT_FAILURE);
+    }
+    printf("main: glfwInit() successful\n");
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -65,33 +72,35 @@ int main(void)
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
+    printf("main: glfwCreateWindow() successful\n");
 
     glfwMakeContextCurrent(window);
+    printf("main: glfwMakeContextCurrent() successful\n");
     glfwSetKeyCallback(window, key_callback);
+
+    g_plugin->PluginInitialize(NULL, NULL, window, 800, 600);
+    printf("main: g_plugin->PluginInitialize() successful\n");
 
     const GLubyte* renderer = glGetString(GL_RENDERER);
     const GLubyte* version = glGetString(GL_VERSION);
     printf("Renderer: %s\n", renderer);
     printf("OpenGL version supported %s\n", version);
 
-    Pa_Initialize();
-
-    g_plugin.PluginPreInitialize(0, 0);
-    g_plugin.PluginInitialize(NULL, NULL, NULL, 800, 600);
-
     // Start the audio capture thread
     g_audio_thread_args.hr = 0;
     std::thread audio_thread(LoopbackCaptureThreadFunction, &g_audio_thread_args);
     audio_thread.detach();
 
+    printf("main: entering main loop\n");
     while (!glfwWindowShouldClose(window))
     {
         RenderFrame();
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
+    printf("main: exiting main loop\n");
 
-    g_plugin.PluginQuit();
+    g_plugin->PluginQuit();
     Pa_Terminate();
     glfwDestroyWindow(window);
     glfwTerminate();

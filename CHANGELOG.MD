@@ -2,6 +2,14 @@
 
 This file documents the major changes made to the MilkDrop3 codebase in the effort to port it to Linux.
 
+## OpenGL Port and Rendering
+
+- **Core Rendering Pipeline Ported to OpenGL:** The core rendering pipeline has been ported from DirectX to OpenGL. This is a major milestone in the porting effort.
+- **Vertex Mesh Rendering:** The DirectX vertex buffer and declaration logic has been replaced with modern OpenGL, using Vertex Buffer Objects (VBOs) and Vertex Array Objects (VAOs) to efficiently manage the mesh data on the GPU.
+- **Shader Porting:** The core warp, comp, and blur shaders have been translated from HLSL to GLSL. A new shader loading utility has been implemented to compile and link the new GLSL shaders.
+- **Texture Management:** The texture manager has been refactored to use `stb_image.h` for image loading and OpenGL functions for texture creation and management.
+- **Integration:** The ported components have been integrated into the main render loop, and the `DrawCustomWaves` and `DrawCustomShapes` functions have been implemented using OpenGL.
+
 ## Rendering and Core
 
 - **Replaced GLEW with GLAD:** The GLEW library, which was causing intractable initialization errors, has been replaced with GLAD. This involved generating the GLAD loader, updating the build system, and modifying the code to use the new library.

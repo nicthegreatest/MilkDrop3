@@ -4,12 +4,11 @@ This file outlines the remaining tasks to complete the Linux port of MilkDrop3.
 
 ## High Priority
 
-- **Port Rendering from DirectX to OpenGL:** This is the largest remaining task. The core rendering logic in `vis_milk2/` is still heavily dependent on DirectX 9.
-    - **Implement Basic Rendering:** The first step is to implement a basic rendering test to confirm that the OpenGL context is working correctly. This could be as simple as clearing the screen to a solid color.
-    - **`plugin.cpp`:** This file contains the main rendering loop and DirectX API calls. It needs to be refactored to use OpenGL.
-    - **`support.cpp`:** The helper functions for 3D math need to be re-implemented using an OpenGL-friendly math library like GLM.
-    - **Shaders:** The DirectX HLSL shaders need to be ported to GLSL.
-    - **Vertex and Texture Management:** All code related to creating and managing vertex buffers, vertex declarations, and textures needs to be ported from DirectX to OpenGL (VBOs, VAOs, `glTexImage2D`, etc.).
+- **Debug Blank Screen Issue:** The application now compiles and runs, opening a window, but the screen is black. The next step is to debug the rendering pipeline to identify why nothing is being drawn. This will likely involve:
+    - Verifying that the vertex data is being passed to the shaders correctly.
+    - Checking the shader compilation and linking for errors.
+    - Ensuring that textures are being loaded and bound correctly.
+    - Using `glGetError()` to check for OpenGL errors.
 
 - **Remove Windows API Dependencies:** Many files in `vis_milk2/` still use Windows API elements for UI and other functions. These need to be replaced with cross-platform alternatives (e.g., using GLFW for windowing and input) or removed.
     - **`pluginshell.h` / `pluginshell.cpp`:** Contains the main window procedure (`WindowProc`) and handles Windows messages (e.g., `WM_KEYDOWN`). This needs to be completely refactored for a GLFW-based event loop.
@@ -27,3 +26,9 @@ This file outlines the remaining tasks to complete the Linux port of MilkDrop3.
 ## Low Priority
 
 - **Review and Refine Build System:** The `CMakeLists.txt` file has been modified to get the project compiling, but it could be improved and organized for better cross-platform support.
+
+## Completed
+
+- **Port Rendering from DirectX to OpenGL:** The core rendering logic in `vis_milk2/` has been ported to OpenGL.
+    - **Vertex and Texture Management:** All code related to creating and managing vertex buffers, vertex declarations, and textures has been ported from DirectX to OpenGL (VBOs, VAOs, `glTexImage2D`, etc.).
+    - **Shaders:** The DirectX HLSL shaders have been ported to GLSL.

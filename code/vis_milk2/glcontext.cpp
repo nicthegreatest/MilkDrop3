@@ -30,9 +30,11 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "glcontext.h"
 #include "utility.h"
 #include <string.h>
+#include <stdio.h>
 
 GLContext::GLContext(GLFWwindow* window, wchar_t* szIniFile)
 {
+    printf("GLContext: constructor\n");
     m_window = window;
     m_truly_exiting = 0;
     m_bpp = 0;
@@ -58,13 +60,17 @@ void GLContext::Internal_CleanUp()
 
 bool GLContext::Internal_Init(GLCONTEXT_PARAMS *pParams, bool bFirstInit)
 {
+    printf("GLContext: Internal_Init\n");
     memcpy(&m_current_mode, pParams, sizeof(GLCONTEXT_PARAMS));
 
     glfwMakeContextCurrent(m_window);
+    printf("GLContext: Internal_Init: glfwMakeContextCurrent successful\n");
     if (!gladLoadGL((GLADloadfunc)glfwGetProcAddress)) {
+        printf("GLContext: Internal_Init: gladLoadGL failed\n");
         // handle error
         return false;
     }
+    printf("GLContext: Internal_Init: gladLoadGL successful\n");
 
     const GLubyte* renderer = glGetString(GL_RENDERER);
     const GLubyte* version = glGetString(GL_VERSION);
@@ -82,11 +88,13 @@ bool GLContext::Internal_Init(GLCONTEXT_PARAMS *pParams, bool bFirstInit)
     m_bpp = 32; // Assuming 32-bit color depth
 
     m_ready = true;
+    printf("GLContext: Internal_Init successful\n");
     return true;
 }
 
 bool GLContext::StartOrRestartDevice(GLCONTEXT_PARAMS *pParams)
 {
+    printf("GLContext: StartOrRestartDevice\n");
     if (!m_ready)
     {
         return Internal_Init(pParams, true);
