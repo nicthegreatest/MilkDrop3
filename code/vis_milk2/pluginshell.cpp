@@ -214,9 +214,9 @@ void CPluginShell::StuffParams(void* pParams)
     // Stubbed out
 }
 
-int CPluginShell::InitDirectX(LPDIRECT3DDEVICE9 device, void* d3dpp, HWND hwnd)
+int CPluginShell::InitDirectX(void* device, void* d3dpp, void* window)
 {
-    m_lpDX = new GLContext((GLFWwindow*)hwnd, (wchar_t*)m_szConfigIniFile);
+    m_lpDX = new GLContext((GLFWwindow*)window, (wchar_t*)m_szConfigIniFile);
 	if (!m_lpDX)
 	{
 		fprintf(stderr, "Unable to init GLContext\n");
@@ -340,9 +340,9 @@ int CPluginShell::PluginPreInitialize(HWND hWinampWnd, HINSTANCE hWinampInstance
 	return TRUE;
 }
 
-int CPluginShell::PluginInitialize(LPDIRECT3DDEVICE9 device, void* d3dpp, HWND hwnd, int iWidth, int iHeight)
+int CPluginShell::PluginInitialize(void* device, void* d3dpp, void* window, int iWidth, int iHeight)
 {
-    if (!InitDirectX(device, d3dpp, hwnd)) return false;
+    if (!InitDirectX(device, d3dpp, window)) return false;
     m_lpDX->m_client_width = iWidth;
     m_lpDX->m_client_height = iHeight;
     m_lpDX->m_REAL_client_height = iHeight;
