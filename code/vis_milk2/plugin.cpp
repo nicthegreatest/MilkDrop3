@@ -418,8 +418,62 @@ int CPlugin::AllocateMyDX9Stuff()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(WFVERTEX), (void*)0);
     glEnableVertexAttribArray(0);
 
+    // Create fullscreen quad
+    glGenVertexArrays(1, &m_fs_quad_vao);
+    glGenBuffers(1, &m_fs_quad_vbo);
+    glBindVertexArray(m_fs_quad_vao);
+    glBindBuffer(GL_ARRAY_BUFFER, m_fs_quad_vbo);
+    float quadStrip[] = {
+        -1.0f, -1.0f, 0.0f, 0.0f, // bottom-left
+         1.0f, -1.0f, 1.0f, 0.0f, // bottom-right
+        -1.0f,  1.0f, 0.0f, 1.0f, // top-left
+         1.0f,  1.0f, 1.0f, 1.0f  // top-right
+    };
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quadStrip), &quadStrip, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+
+    // Create render target FBOs and textures
+    glGenFramebuffers(2, m_render_target_fbo);
+    glGenTextures(2, m_render_target_tex);
+
+    for (int i = 0; i < 2; i++) {
+        glBindFramebuffer(GL_FRAMEBUFFER, m_render_target_fbo[i]);
+        glBindTexture(GL_TEXTURE_2D, m_render_target_tex[i]);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_nTexSizeX, m_nTexSizeY, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_render_target_tex[i], 0);
+    }
+
+    // Create blur FBOs and textures
+    glGenFramebuffers(NUM_BLUR_TEX, m_blur_fbo);
+    glGenTextures(NUM_BLUR_TEX, m_blur_tex);
+    int w = m_nTexSizeX;
+    int h = m_nTexSizeY;
+    for (int i = 0; i < NUM_BLUR_TEX; i++) {
+        w /= 2;
+        h /= 2;
+        m_nBlurTexW[i] = w;
+        m_nBlurTexH[i] = h;
+        glBindFramebuffer(GL_FRAMEBUFFER, m_blur_fbo[i]);
+        glBindTexture(GL_TEXTURE_2D, m_blur_tex[i]);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_blur_tex[i], 0);
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
     m_text_renderer = new TextRenderer(GetWidth(), GetHeight());
-    m_text_renderer->Load("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 14);
+    m_text_renderer->Load("data/fonts/DejaVuSans.ttf", 14);
 
 
     if (!m_bInitialPresetSelected)
@@ -454,6 +508,13 @@ void CPlugin::CleanUpMyDX9Stuff(int final_cleanup)
     glDeleteVertexArrays(1, &m_menu_vao);
     glDeleteBuffers(1, &m_menu_vbo);
     glDeleteProgram(m_menu_shader_program);
+
+    glDeleteVertexArrays(1, &m_fs_quad_vao);
+    glDeleteBuffers(1, &m_fs_quad_vbo);
+    glDeleteFramebuffers(2, m_render_target_fbo);
+    glDeleteTextures(2, m_render_target_tex);
+    glDeleteFramebuffers(NUM_BLUR_TEX, m_blur_fbo);
+    glDeleteTextures(NUM_BLUR_TEX, m_blur_tex);
 
     delete m_text_renderer;
 }
@@ -678,9 +739,71 @@ void CPlugin::ReadCustomMessages() {}
 void CPlugin::LaunchCustomMessage(int nMsgNum) {}
 bool CPlugin::LaunchSprite(int nSpriteNum, int nSlot) { return true; }
 void CPlugin::KillSprite(int iSlot) {}
-bool CPlugin::LoadShaders(PShaderSet* sh, CState* pState, bool bTick) { return true; }
+bool CPlugin::LoadShaders(PShaderSet* sh, CState* pState, bool bTick)
+{
+    sh->warp.Clear();
+    sh->comp.Clear();
+
+    if (pState->m_nWarpPSVersion > 0)
+    {
+        sh->warp.program = LoadShaderFromStrings(m_szDefaultWarpVShaderText, pState->m_szWarpShadersText);
+        if (sh->warp.program == 0)
+        {
+            AddError("Failed to compile warp shader!", 10.0f, ERR_PRESET, true);
+            pState->m_nWarpPSVersion = 0;
+        }
+        else
+        {
+            sh->warp.params.CacheParams(sh->warp.program, true);
+        }
+    }
+
+    if (pState->m_nCompPSVersion > 0)
+    {
+        sh->comp.program = LoadShaderFromStrings(m_szDefaultCompVShaderText, pState->m_szCompShadersText);
+        if (sh->comp.program == 0)
+        {
+            AddError("Failed to compile composite shader!", 10.0f, ERR_PRESET, true);
+            pState->m_nCompPSVersion = 0;
+        }
+        else
+        {
+            sh->comp.params.CacheParams(sh->comp.program, true);
+        }
+    }
+
+    return true;
+}
 void CPlugin::UvToMathSpace(float u, float v, float* rad, float* ang) {}
-//void CPlugin::ApplyShaderParams(CShaderParams* p, void* pCT, CState* pState) {}
+void CPlugin::ApplyShaderParams(CShaderParams* p, CState* pState)
+{
+    if (p->rand_frame != -1)
+    {
+        glUniform4f(p->rand_frame, m_rand_frame.x, m_rand_frame.y, m_rand_frame.z, m_rand_frame.w);
+    }
+
+    if (p->rand_preset != -1)
+    {
+        glUniform4f(p->rand_preset, pState->m_rand_preset.x, pState->m_rand_preset.y, pState->m_rand_preset.z, pState->m_rand_preset.w);
+    }
+
+    for (int i = 0; i < (NUM_Q_VAR + 3) / 4; i++)
+    {
+        if (p->q_const_handles[i] != -1)
+        {
+            float q_vars[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+            for (int j = 0; j < 4; j++)
+            {
+                int q_idx = i * 4 + j;
+                if (q_idx < NUM_Q_VAR)
+                {
+                    q_vars[j] = *pState->var_pv_q[q_idx];
+                }
+            }
+            glUniform4fv(p->q_const_handles[i], 1, q_vars);
+        }
+    }
+}
 //void CPlugin::RestoreShaderParams() {}
 bool CPlugin::AddNoiseTex(const char* szTexName, int size, int zoom_factor) { return true; }
 bool CPlugin::AddNoiseVol(const char* szTexName, int size, int zoom_factor) { return true; }
@@ -689,10 +812,74 @@ bool CPlugin::RecompilePShader(const char* szShadersText, PShaderInfo *si, int s
 bool CPlugin::EvictSomeTexture() { return true; }
 void CPlugin::OnAltK() {}
 
-void CShaderParams::Clear() {}
-void CShaderParams::CacheParams(void* pCT, bool bHardErrors) {}
-void CShaderParams::OnTextureEvict(void* texptr) {}
-CShaderParams::CShaderParams() {}
-CShaderParams::~CShaderParams() {}
-void VShaderInfo::Clear() {}
-void PShaderInfo::Clear() {}
+void CShaderParams::Clear()
+{
+    rand_frame = -1;
+    rand_preset = -1;
+    for (int i = 0; i < 24; i++) {
+        const_handles[i] = -1;
+        rot_mat[i] = -1;
+    }
+    for (int i = 0; i < (NUM_Q_VAR + 3) / 4; i++) {
+        q_const_handles[i] = -1;
+    }
+    texsize_params.clear();
+}
+
+void CShaderParams::CacheParams(GLuint program, bool bHardErrors)
+{
+    rand_frame = glGetUniformLocation(program, "rand_frame");
+    rand_preset = glGetUniformLocation(program, "rand_preset");
+
+    for (int i = 0; i < 24; i++) {
+        char sz[32];
+        sprintf(sz, "const_reg%02d", i);
+        const_handles[i] = glGetUniformLocation(program, sz);
+    }
+
+    for (int i = 0; i < (NUM_Q_VAR + 3) / 4; i++) {
+        char sz[32];
+        sprintf(sz, "q_const%d", i + 1);
+        q_const_handles[i] = glGetUniformLocation(program, sz);
+    }
+
+    for (int i = 0; i < 24; i++) {
+        char sz[32];
+        sprintf(sz, "rot_mat%02d", i);
+        rot_mat[i] = glGetUniformLocation(program, sz);
+    }
+}
+
+void CShaderParams::OnTextureEvict(GLuint texptr)
+{
+    // Stub
+}
+
+CShaderParams::CShaderParams()
+{
+    Clear();
+}
+
+CShaderParams::~CShaderParams()
+{
+}
+
+void VShaderInfo::Clear()
+{
+    if (program)
+    {
+        glDeleteProgram(program);
+        program = 0;
+    }
+    params.Clear();
+}
+
+void PShaderInfo::Clear()
+{
+    if (program)
+    {
+        glDeleteProgram(program);
+        program = 0;
+    }
+    params.Clear();
+}

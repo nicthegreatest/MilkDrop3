@@ -202,26 +202,22 @@ class CShaderParams
 {
 public:
     // float4 handles:
-    D3DXHANDLE rand_frame ;
-    D3DXHANDLE rand_preset;
-    D3DXHANDLE const_handles[24];
-    D3DXHANDLE q_const_handles[(NUM_Q_VAR+3)/4];
-    D3DXHANDLE rot_mat[24];
+    GLint rand_frame;
+    GLint rand_preset;
+    GLint const_handles[24];
+    GLint q_const_handles[(NUM_Q_VAR + 3) / 4];
+    GLint rot_mat[24];
 
     typedef std::vector<TexSizeParamInfo> TexSizeParamInfoList;
     TexSizeParamInfoList texsize_params;
 
     // sampler stages for various PS texture bindings:
-    //int texbind_vs;
-    //int texbind_disk[32];
-    //int texbind_voronoi;
-    //...
     SamplerInfo   m_texture_bindings[16];  // an entry for each sampler slot.  These are ALIASES - DO NOT DELETE.
     tex_code      m_texcode[16];  // if ==TEX_VS, forget the pointer - texture bound @ that stage is the double-buffered VS.
 
     void Clear();
-    void CacheParams(LPD3DXCONSTANTTABLE pCT, bool bHardErrors);
-    void OnTextureEvict(LPDIRECT3DBASETEXTURE9 texptr);
+    void CacheParams(GLuint program, bool bHardErrors);
+    void OnTextureEvict(GLuint texptr);
     CShaderParams();
     ~CShaderParams();
 };
@@ -229,10 +225,9 @@ public:
 class VShaderInfo
 {
 public:
-    IDirect3DVertexShader9* ptr;
-    LPD3DXCONSTANTTABLE     CT;
-    CShaderParams           params;
-    VShaderInfo()  { ptr=NULL; CT=NULL; params.Clear(); }
+    GLuint program;
+    CShaderParams params;
+    VShaderInfo() { program = 0; params.Clear(); }
     ~VShaderInfo() { Clear(); }
     void Clear();
 };
@@ -240,10 +235,9 @@ public:
 class PShaderInfo
 {
 public:
-    IDirect3DPixelShader9*  ptr;
-    LPD3DXCONSTANTTABLE     CT;
-    CShaderParams           params;
-    PShaderInfo()  { ptr=NULL; CT=NULL; params.Clear(); }
+    GLuint program;
+    CShaderParams params;
+    PShaderInfo() { program = 0; params.Clear(); }
     ~PShaderInfo() { Clear(); }
     void Clear();
 };
@@ -374,7 +368,7 @@ public:
         IDirect3DVertexDeclaration9* m_pWfVertDecl;
         IDirect3DVertexDeclaration9* m_pMyVertDecl;
 
-        D3DXVECTOR4 m_rand_frame;  // 4 random floats (0..1); randomized once per frame; fed to pixel shaders.
+        glm::vec4 m_rand_frame;  // 4 random floats (0..1); randomized once per frame; fed to pixel shaders.
 
         // RUNTIME SETTINGS THAT WE'VE ADDED
         bool        m_bShowMenu;
@@ -498,11 +492,17 @@ public:
         char		m_szPresetDir[MAX_PATH];
         float		m_fRandStart[4];
 
-        // DIRECTX 9:
-        IDirect3DTexture9 *m_lpVS[2];
+        // Shader pipeline resources
+        GLuint m_render_target_fbo[2];
+        GLuint m_render_target_tex[2];
+        GLuint m_blur_fbo[NUM_BLUR_TEX];
+        GLuint m_blur_tex[NUM_BLUR_TEX];
+        GLuint m_fs_quad_vao;
+        GLuint m_fs_quad_vbo;
+
+        // DIRECTX 9 (placeholders)
         #define NUM_BLUR_TEX 6
         #if (NUM_BLUR_TEX>0)
-	    IDirect3DTexture9 *m_lpBlur[NUM_BLUR_TEX]; // each is successively 1/2 size of prev.
         int               m_nBlurTexW[NUM_BLUR_TEX];
         int               m_nBlurTexH[NUM_BLUR_TEX];
         #endif
@@ -635,7 +635,7 @@ public:
 
         bool        LoadShaders(PShaderSet* sh, CState* pState, bool bTick);
         void        UvToMathSpace(float u, float v, float* rad, float* ang);
-        void        ApplyShaderParams(CShaderParams* p, LPD3DXCONSTANTTABLE pCT, CState* pState);
+        void        ApplyShaderParams(CShaderParams* p, CState* pState);
         void        RestoreShaderParams();
         bool        AddNoiseTex(const char* szTexName, int size, int zoom_factor);
         bool        AddNoiseVol(const char* szTexName, int size, int zoom_factor);

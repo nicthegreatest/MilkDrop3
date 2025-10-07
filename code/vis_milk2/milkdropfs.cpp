@@ -336,6 +336,11 @@ void CPlugin::RenderFrame(int bRedraw)
 	int i;
     float fDeltaT = 1.0f/GetFps();
 
+    m_rand_frame.x = FRAND;
+    m_rand_frame.y = FRAND;
+    m_rand_frame.z = FRAND;
+    m_rand_frame.w = FRAND;
+
     if (bRedraw)
     {
 	    IDirect3DTexture9* pTemp = m_lpVS[0];
@@ -439,12 +444,36 @@ void CPlugin::RenderFrame(int bRedraw)
 
 	RunPerFrameEquations(code);
 
+    glBindFramebuffer(GL_FRAMEBUFFER, m_render_target_fbo[0]);
+    glViewport(0, 0, m_nTexSizeX, m_nTexSizeY);
+    glClear(GL_COLOR_BUFFER_BIT);
 
     DrawMotionVectors();
 	DrawCustomShapes();
 	DrawCustomWaves();
 	DrawWave(mysound.fWave[0], mysound.fWave[1]);
 	DrawSprites();
+
+    if (bNewPresetUsesWarpShader)
+    {
+        WarpedBlit_Shaders(0, false, false, false, false);
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, 0, GetWidth(), GetHeight());
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    if (bNewPresetUsesCompShader)
+    {
+        ShowToUser_Shaders(0, false, false, false, false);
+    }
+    else
+    {
+        // Fallback for non-shader presets
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, m_render_target_fbo[0]);
+        glBlitFramebuffer(0, 0, m_nTexSizeX, m_nTexSizeY, 0, 0, GetWidth(), GetHeight(), GL_COLOR_BUFFER_BIT, GL_LINEAR);
+    }
+
 
 	float fProgress = (GetTime() - m_supertext.fStartTime) / m_supertext.fDuration;
 
@@ -518,10 +547,39 @@ void CPlugin::ComputeGridAlphaValues()
 
 void CPlugin::WarpedBlit_NoShaders(int nPass, bool bAlphaBlend, bool bFlipAlpha, bool bCullTiles, bool bFlipCulling)
 {
+    // Simple blit for non-shader presets
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, m_render_target_fbo[0]);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_render_target_fbo[1]);
+    glBlitFramebuffer(0, 0, m_nTexSizeX, m_nTexSizeY, 0, 0, m_nTexSizeX, m_nTexSizeY, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+
+    std::swap(m_render_target_fbo[0], m_render_target_fbo[1]);
+    std::swap(m_render_target_tex[0], m_render_target_tex[1]);
 }
 
 void CPlugin::WarpedBlit_Shaders(int nPass, bool bAlphaBlend, bool bFlipAlpha, bool bCullTiles, bool bFlipCulling)
 {
+    // Bind the destination FBO
+    glBindFramebuffer(GL_FRAMEBUFFER, m_render_target_fbo[1]);
+    glViewport(0, 0, m_nTexSizeX, m_nTexSizeY);
+
+    // Use the warp shader
+    PShaderSet* sh = &m_shaders;
+    glUseProgram(sh->warp.program);
+
+    // Set uniforms
+    ApplyShaderParams(&sh->warp.params, m_pState);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_render_target_tex[0]);
+    glUniform1i(glGetUniformLocation(sh->warp.program, "sampler_main"), 0);
+    // TODO: Apply other shader params
+
+    // Draw the fullscreen quad
+    glBindVertexArray(m_fs_quad_vao);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    // Swap render targets for the next pass
+    std::swap(m_render_target_fbo[0], m_render_target_fbo[1]);
+    std::swap(m_render_target_tex[0], m_render_target_tex[1]);
 }
 
 void CPlugin::DrawCustomShapes()
@@ -788,10 +846,32 @@ void CPlugin::DrawSprites()
 
 void CPlugin::ShowToUser_NoShaders()
 {
+    // Fallback for non-shader presets
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, m_render_target_fbo[0]);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    glBlitFramebuffer(0, 0, m_nTexSizeX, m_nTexSizeY, 0, 0, GetWidth(), GetHeight(), GL_COLOR_BUFFER_BIT, GL_LINEAR);
 }
 
 void CPlugin::ShowToUser_Shaders(int nPass, bool bAlphaBlend, bool bFlipAlpha, bool bCullTiles, bool bFlipCulling)
 {
+    // Bind the default framebuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, 0, GetWidth(), GetHeight());
+
+    // Use the composite shader
+    PShaderSet* sh = &m_shaders;
+    glUseProgram(sh->comp.program);
+
+    // Set uniforms
+    ApplyShaderParams(&sh->comp.params, m_pState);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_render_target_tex[0]);
+    glUniform1i(glGetUniformLocation(sh->comp.program, "sampler_main"), 0);
+    // TODO: Apply other shader params
+
+    // Draw the fullscreen quad
+    glBindVertexArray(m_fs_quad_vao);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
 void CPlugin::ShowSongTitleAnim(int w, int h, float fProgress)
