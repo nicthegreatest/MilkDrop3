@@ -73,9 +73,9 @@ public:
     char*  GetPluginsDirPath();
     char*  GetConfigIniFile();
 	char*     GetConfigIniFileA();
-protected:
     int          GetWidth();
     int          GetHeight();
+protected:
     int          GetBitDepth();
     char*        GetDriverFilename();
     char*        GetDriverDescription();

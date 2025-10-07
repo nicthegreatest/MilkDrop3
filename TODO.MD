@@ -4,23 +4,11 @@ This file outlines the remaining tasks to complete the Linux port of MilkDrop3.
 
 ## High Priority
 
-- **Complete UI and Event Handling Port:** The initial refactoring of `pluginshell` and `menu` has removed the direct Windows API dependencies from the class definitions, but the work is incomplete. The next critical step is to fully implement the cross-platform UI and event handling.
-    - **Implement `MyKeyHandler` Call Site:** The main application loop in `main.cpp` must be updated to set up a GLFW key callback that calls the `MyKeyHandler` function on the `CPlugin` instance. This will reconnect keyboard input.
-    - **Implement Menu Logic:** The `HandleKeydown` function in `menu.cpp` needs to be implemented to process key events for menu navigation.
-    - **Implement Menu Rendering:** The `DrawMenu` function in `menu.cpp` must be implemented to render the menu using OpenGL, as the original GDI-based implementation has been removed.
-    - **Remove Remaining Stubs:** Any remaining UI-related stubs or placeholder functions should be fully implemented or removed.
+- **Implement Full Menu Rendering:** The menu's background and selector bar are now rendering, but the text for menu items is still missing. The next major task is to implement a text rendering solution to draw the menu items and make the menu fully interactive. This will likely involve integrating a library like FreeType.
 
-- **Debug Blank Screen Issue:** With the UI and event handling refactored, the primary focus can return to the blank screen issue. The goal is to get the visualizer to render correctly. This will likely involve:
-    - Verifying that the vertex data is being passed to the shaders correctly.
-    - Checking the shader compilation and linking for errors.
-    - Ensuring that textures are being loaded and bound correctly.
-    - Using `glGetError()` to check for OpenGL errors.
-
-- **(Partially Complete) Remove Windows API Dependencies:** The core `pluginshell` and `menu` classes have been refactored to remove Windows-specific types from their public interfaces. However, other dependencies may remain elsewhere in the codebase.
+- **Implement Shader-based Rendering Effects:** The `WarpedBlit_Shaders` and `ShowToUser_Shaders` functions are currently placeholders. These need to be fully implemented to support the advanced visual effects from presets, which are a core feature of MilkDrop.
 
 ## Medium Priority
-
-- **`libsamplerate` Dependency:** The new `EEL_VM` library has an optional dependency on `libsamplerate` which is currently missing. The build may fail on code paths that require it. We need to either provide this dependency or ensure the code paths are not used.
 
 - **Cleanup Stubbed Headers:** The headers `support.h` and `texmgr.h` are currently stubbed out on Linux. As the OpenGL port progresses, these stubs should be replaced with proper OpenGL-based implementations.
 
@@ -32,6 +20,17 @@ This file outlines the remaining tasks to complete the Linux port of MilkDrop3.
 
 ## Completed
 
-- **Port Rendering from DirectX to OpenGL:** The core rendering logic in `vis_milk2/` has been ported to OpenGL.
-    - **Vertex and Texture Management:** All code related to creating and managing vertex buffers, vertex declarations, and textures has been ported from DirectX to OpenGL (VBOs, VAOs, `glTexImage2D`, etc.).
-    - **Shaders:** The DirectX HLSL shaders have been ported to GLSL.
+- **Core Rendering Pipeline:**
+    - The `DrawWave`, `DrawCustomShapes`, and `DrawSprites` functions have been implemented using OpenGL, shaders, VAOs, and VBOs. The application now renders the waveform, custom shapes, and sprites.
+    - The application now successfully builds and runs without any major rendering errors.
+
+- **UI and Event Handling Port:**
+    - **`MyKeyHandler` Call Site:** The main application loop in `main.cpp` now correctly calls the `MyKeyHandler` function on the `CPlugin` instance, connecting keyboard input.
+    - **Menu Logic:** The `HandleKeydown` function in `menu.cpp` has been implemented to process key events for menu navigation.
+
+- **Build and Runtime Stability:**
+    - Resolved numerous build and runtime errors, including a segmentation fault on startup.
+    - Installed all necessary dependencies (`portaudio`, `glfw`, `opengl`, `libsamplerate`).
+    - The application now compiles and runs reliably in a headless environment using `Xvfb`.
+
+- **Removed Windows API Dependencies:** The core `pluginshell` and `menu` classes have been refactored to remove Windows-specific types from their public interfaces. Most Windows-specific functions have been stubbed out or replaced.

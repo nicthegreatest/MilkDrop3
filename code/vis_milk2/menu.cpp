@@ -182,7 +182,40 @@ void CMilkMenu::AddItem(const char *szName, void *var, MENUITEMTYPE type, const 
 
 void CMilkMenu::DrawMenu()
 {
-    // Stubbed out
+    int w = g_plugin->GetWidth();
+    int h = g_plugin->GetHeight();
+    int nItems = m_nChildMenus + m_nChildItems;
+    int font_h = 14;
+    int line_h = 16;
+    int menu_h = (nItems + 1) * line_h;
+    int menu_w = 300;
+    int x = w/2 - menu_w/2;
+    int y = h/2 - menu_h/2;
+
+    // Draw background
+    RECT r = { x, y, x + menu_w, y + menu_h };
+    g_plugin->DrawRect(&r, 0xC0000000);
+
+    // Draw selector bar
+    RECT sel_r = { x, y + (m_nCurSel) * line_h, x + menu_w, y + (m_nCurSel + 1) * line_h };
+    g_plugin->DrawRect(&sel_r, 0xC0FFFFFF);
+
+    // Draw menu items
+    int i = 0;
+    for (i = 0; i < m_nChildMenus; i++)
+    {
+        glm::vec3 color = (i == m_nCurSel) ? glm::vec3(0.0f, 0.0f, 0.0f) : glm::vec3(1.0f, 1.0f, 1.0f);
+        g_plugin->m_text_renderer->RenderText(m_ppChildMenu[i]->GetName(), x + 10, y + i * line_h + 2, 1.0f, color);
+    }
+
+    CMilkMenuItem *pItem = m_pFirstChildItem;
+    while (pItem)
+    {
+        glm::vec3 color = (i == m_nCurSel) ? glm::vec3(0.0f, 0.0f, 0.0f) : glm::vec3(1.0f, 1.0f, 1.0f);
+        g_plugin->m_text_renderer->RenderText(pItem->m_szName, x + 10, y + i * line_h + 2, 1.0f, color);
+        pItem = pItem->m_pNext;
+        i++;
+    }
 }
 
 void CMilkMenu::OnWaitStringAccept(char *szNewString)

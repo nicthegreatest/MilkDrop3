@@ -92,6 +92,8 @@ pkg_check_modules(PORTAUDIO REQUIRED portaudio-2.0)
 
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
+find_package(Freetype REQUIRED)
+find_package(glm REQUIRED)
 
 set(VIS_MILK2_SOURCES
     vis_milk2/main.cpp
@@ -105,6 +107,7 @@ set(VIS_MILK2_SOURCES
     vis_milk2/support.cpp
     vis_milk2/texmgr.cpp
     vis_milk2/textmgr.cpp
+    vis_milk2/text_renderer.cpp
     vis_milk2/utility.cpp
     vis_milk2/wasabi.cpp
     vis_milk2/glad.c
@@ -123,9 +126,12 @@ target_include_directories(milkdrop3 PUBLIC
     "${PROJECT_SOURCE_DIR}/ns-eel2"
     "${PROJECT_SOURCE_DIR}/vis_milk2"
     "${PROJECT_SOURCE_DIR}/ns-eel2/numericSys/HPFloat"
+    /usr/include/
     ${OPENGL_INCLUDE_DIR}
     ${glfw3_INCLUDE_DIRS}
     ${PORTAUDIO_INCLUDE_DIRS}
+    ${FREETYPE_INCLUDE_DIRS}
+    ${glm_INCLUDE_DIRS}
 )
 
 # Link libraries
@@ -133,6 +139,7 @@ target_link_libraries(milkdrop3
     ${OPENGL_LIBRARIES}
     glfw
     ${PORTAUDIO_LIBRARIES}
+    ${FREETYPE_LIBRARIES}
 )
 
 # Copy data files to the build directory

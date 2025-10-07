@@ -244,7 +244,7 @@ void CPlugin::MyPreInitialize()
     m_nMaxBytes  = 2000000000;
     m_dwShaderFlags = 0;
     m_pShaderCompileErrors = NULL;
-    m_bShowMenu = false;
+    m_bShowMenu = true;
     m_bWarpShaderLock = false;
     m_bCompShaderLock = false;
     m_bNeedRescanTexturesDir = true;
@@ -408,6 +408,19 @@ int CPlugin::AllocateMyDX9Stuff()
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(SPRITEVERTEX), (void*)offsetof(SPRITEVERTEX, tu));
     glEnableVertexAttribArray(2);
 
+    // Load shaders and create VBO/VAO for menu
+    m_menu_shader_program = LoadShader("data/shaders/menu_vs.glsl", "data/shaders/menu_fs.glsl");
+    glGenVertexArrays(1, &m_menu_vao);
+    glGenBuffers(1, &m_menu_vbo);
+    glBindVertexArray(m_menu_vao);
+    glBindBuffer(GL_ARRAY_BUFFER, m_menu_vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(WFVERTEX) * 4, NULL, GL_DYNAMIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(WFVERTEX), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    m_text_renderer = new TextRenderer(GetWidth(), GetHeight());
+    m_text_renderer->Load("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 14);
+
 
     if (!m_bInitialPresetSelected)
     {
@@ -437,6 +450,12 @@ void CPlugin::CleanUpMyDX9Stuff(int final_cleanup)
     glDeleteVertexArrays(1, &m_sprite_vao);
     glDeleteBuffers(1, &m_sprite_vbo);
     glDeleteProgram(m_sprite_shader_program);
+
+    glDeleteVertexArrays(1, &m_menu_vao);
+    glDeleteBuffers(1, &m_menu_vbo);
+    glDeleteProgram(m_menu_shader_program);
+
+    delete m_text_renderer;
 }
 
 void CPlugin::MyRenderFn(int redraw)
@@ -478,6 +497,10 @@ void CPlugin::MyRenderFn(int redraw)
 
 void CPlugin::MyRenderUI(int *upper_left_corner_y, int *upper_right_corner_y, int *lower_left_corner_y, int *lower_right_corner_y, int xL, int xR)
 {
+    if (m_bShowMenu)
+    {
+        m_pCurMenu->DrawMenu();
+    }
 }
 
 void CPlugin::MyKeyHandler(int key)
@@ -493,6 +516,50 @@ void CPlugin::MyKeyHandler(int key)
         // Handle regular keys when menu is not shown
         HandleRegularKey(key);
     }
+}
+
+void CPlugin::DrawRect(RECT* pr, DWORD color)
+{
+    // Decode the D3DCOLOR
+    float r = ((color >> 16) & 0xFF) / 255.0f;
+    float g = ((color >> 8)  & 0xFF) / 255.0f;
+    float b = ( color        & 0xFF) / 255.0f;
+    float a = ((color >> 24) & 0xFF) / 255.0f;
+
+    // Get screen dimensions
+    float screen_w = (float)GetWidth();
+    float screen_h = (float)GetHeight();
+
+    // Convert pixel coordinates to Normalized Device Coordinates (-1 to 1)
+    // Y is flipped because screen coords are top-down, NDC is bottom-up.
+    float left   = (pr->left   / screen_w) * 2.0f - 1.0f;
+    float right  = (pr->right  / screen_w) * 2.0f - 1.0f;
+    float top    = 1.0f - (pr->top    / screen_h) * 2.0f;
+    float bottom = 1.0f - (pr->bottom / screen_h) * 2.0f;
+
+    // Define vertices for a quad
+    WFVERTEX vertices[4] = {
+        { right, top,    0.0f, 0 },
+        { left,  top,    0.0f, 0 },
+        { right, bottom, 0.0f, 0 },
+        { left,  bottom, 0.0f, 0 }
+    };
+
+    glUseProgram(m_menu_shader_program);
+
+    // Set the color as a uniform
+    GLint color_loc = glGetUniformLocation(m_menu_shader_program, "u_color");
+    glUniform4f(color_loc, r, g, b, a);
+
+    glBindVertexArray(m_menu_vao);
+    glBindBuffer(GL_ARRAY_BUFFER, m_menu_vbo);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+
+    // Draw the quad as a triangle strip
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    glBindVertexArray(0);
+    glUseProgram(0);
 }
 
 int CPlugin::HandleRegularKey(WPARAM wParam)

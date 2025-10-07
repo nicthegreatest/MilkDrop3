@@ -12,9 +12,7 @@ The original MilkDrop codebase was created by Nullsoft. All credit for the origi
 
 This project is currently undergoing a significant refactoring effort to port the original Windows/DirectX codebase to a modern, cross-platform C++ application that can be compiled and run on Linux using OpenGL.
 
-The UI and event-handling components (`pluginshell` and `menu`) have been refactored to remove Windows-specific dependencies and replace them with a cross-platform approach. However, persistent build environment issues are preventing the application from being compiled and tested, so the impact of these changes on the blank screen issue is currently unverified.
-
-The application now compiles and runs, opening a window. However, the screen is currently black, and the rendering pipeline is being actively debugged.
+The core rendering pipeline has now been implemented using OpenGL. This includes the rendering of the audio-reactive waveform, custom shapes, and sprites. The application now successfully builds and runs, and the main visual components are now visible.
 
 For a detailed list of the major changes that have been completed, see [CHANGELOG.MD](CHANGELOG.MD).
 
