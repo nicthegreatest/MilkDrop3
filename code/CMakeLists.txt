@@ -137,4 +137,3 @@ target_link_libraries(milkdrop3
 
 # Copy data files to the build directory
 file(COPY resources/Milkdrop2/data/ DESTINATION ${CMAKE_BINARY_DIR}/data)
-file(COPY resources/Milkdrop2/presets/ DESTINATION ${CMAKE_BINARY_DIR}/plugins/MilkDrop2/presets)
