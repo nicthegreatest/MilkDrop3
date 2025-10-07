@@ -36,6 +36,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "support.h"
 #include "texmgr.h"
 #include "state.h"
+#include "text_renderer.h"
 #include <vector>
 #include "../ns-eel2/ns-eel.h"
 #include <string>
@@ -533,6 +534,10 @@ public:
         unsigned int m_sprite_vao;
         unsigned int m_sprite_vbo;
         unsigned int m_sprite_shader_program;
+        unsigned int m_menu_vao;
+        unsigned int m_menu_vbo;
+        unsigned int m_menu_shader_program;
+        TextRenderer* m_text_renderer;
 
         bool		m_bMMX;
         //bool		m_bSSE;
@@ -573,6 +578,7 @@ public:
         void AlignWave(int nSamples);
 
         void        DrawTooltip(const char* str, int xR, int yB);
+        void        DrawRect(RECT* pr, DWORD color);
         void        RandomizeBlendPattern();
         void        GenPlasma(int x0, int x1, int y0, int y1, float dt);
         void        LoadPerFrameEvallibVars(CState* pState);
