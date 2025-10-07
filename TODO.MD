@@ -4,21 +4,29 @@ This file outlines the remaining tasks to complete the Linux port of MilkDrop3.
 
 ## High Priority
 
-- **Implement Full Menu Rendering:** The menu's background and selector bar are now rendering, but the text for menu items is still missing. The next major task is to implement a text rendering solution to draw the menu items and make the menu fully interactive. This will likely involve integrating a library like FreeType.
-
-- **Implement Shader-based Rendering Effects:** The `WarpedBlit_Shaders` and `ShowToUser_Shaders` functions are currently placeholders. These need to be fully implemented to support the advanced visual effects from presets, which are a core feature of MilkDrop.
-
-## Medium Priority
-
-- **Cleanup Stubbed Headers:** The headers `support.h` and `texmgr.h` are currently stubbed out on Linux. As the OpenGL port progresses, these stubs should be replaced with proper OpenGL-based implementations.
-
 - **Address Compiler Warnings:** The build still produces a number of warnings related to `const`-correctness and other issues in the `ns-eel2` library. These should be cleaned up.
 
-## Low Priority
-
-- **Review and Refine Build System:** The `CMakeLists.txt` file has been modified to get the project compiling, but it could be improved and organized for better cross-platform support.
-
 ## Completed
+
+- **Implement Full Menu Rendering:**
+    - Integrated FreeType for text rendering.
+    - Added a `TextRenderer` class to handle font loading and text drawing.
+    - The menu now renders with text.
+
+- **Implement Shader-based Rendering Effects:**
+    - The `WarpedBlit_Shaders` and `ShowToUser_Shaders` functions are now fully implemented.
+    - Added support for FBOs for off-screen rendering.
+    - Implemented shader loading from presets.
+
+- **Cleanup Stubbed Headers:**
+    - Replaced DirectX-specific code in `support.h` and `support.cpp` with OpenGL/glm.
+    - Replaced DirectX-specific code in `texmgr.h` and `texmgr.cpp` with OpenGL/stb_image.
+
+- **Review and Refine Build System:**
+    - Reorganized the `CMakeLists.txt` file for better readability.
+    - Improved dependency handling using modern CMake practices.
+    - Set build-type-specific compiler flags.
+    - Added install rules for the application and its data files.
 
 - **Core Rendering Pipeline:**
     - The `DrawWave`, `DrawCustomShapes`, and `DrawSprites` functions have been implemented using OpenGL, shaders, VAOs, and VBOs. The application now renders the waveform, custom shapes, and sprites.

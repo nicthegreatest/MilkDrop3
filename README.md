@@ -12,7 +12,7 @@ The original MilkDrop codebase was created by Nullsoft. All credit for the origi
 
 This project is currently undergoing a significant refactoring effort to port the original Windows/DirectX codebase to a modern, cross-platform C++ application that can be compiled and run on Linux using OpenGL.
 
-The core rendering pipeline has now been implemented using OpenGL. This includes the rendering of the audio-reactive waveform, custom shapes, and sprites. The application now successfully builds and runs, and the main visual components are now visible.
+The core rendering pipeline has now been implemented using OpenGL. This includes the rendering of the audio-reactive waveform, custom shapes, and sprites. The menu system is now fully functional with text rendering, and the shader-based rendering effects for presets have been implemented.
 
 For a detailed list of the major changes that have been completed, see [CHANGELOG.MD](CHANGELOG.MD).
 
@@ -29,6 +29,8 @@ For a list of the remaining tasks required to get the project running, see [TODO
     - `glfw3`
     - `portaudio-2.0`
     - `opengl`
+    - `libglm-dev`
+    - `libfreetype6-dev`
 
 ### Building
 
@@ -43,5 +45,6 @@ For a list of the remaining tasks required to get the project running, see [TODO
 After a successful build, the executable will be located at `build/milkdrop3`. Run it from the `build` directory:
 
 ```
+cd build
 ./milkdrop3
 ```
