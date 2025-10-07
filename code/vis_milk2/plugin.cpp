@@ -244,6 +244,7 @@ void CPlugin::MyPreInitialize()
     m_nMaxBytes  = 2000000000;
     m_dwShaderFlags = 0;
     m_pShaderCompileErrors = NULL;
+    m_bShowMenu = false;
     m_bWarpShaderLock = false;
     m_bCompShaderLock = false;
     m_bNeedRescanTexturesDir = true;
@@ -372,6 +373,42 @@ int CPlugin::AllocateMyDX9Stuff()
 	m_indices_strip = new int[(m_nGridX+2)*(m_nGridY*2)];
 	m_indices_list  = new int[m_nGridX*m_nGridY*6];
 	if (!m_verts || !m_vertinfo) return false;
+
+    // Load shaders and create VBO/VAO for waveform
+    m_wave_shader_program = LoadShader("data/shaders/wave_vs.glsl", "data/shaders/wave_fs.glsl");
+    glGenVertexArrays(1, &m_wave_vao);
+    glGenBuffers(1, &m_wave_vbo);
+    glBindVertexArray(m_wave_vao);
+    glBindBuffer(GL_ARRAY_BUFFER, m_wave_vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(WFVERTEX) * 576, NULL, GL_DYNAMIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(WFVERTEX), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    // Load shaders and create VBO/VAO for shapes
+    m_shape_shader_program = LoadShader("data/shaders/shape_vs.glsl", "data/shaders/shape_fs.glsl");
+    glGenVertexArrays(1, &m_shape_vao);
+    glGenBuffers(1, &m_shape_vbo);
+    glBindVertexArray(m_shape_vao);
+    glBindBuffer(GL_ARRAY_BUFFER, m_shape_vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(WFVERTEX) * 102, NULL, GL_DYNAMIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(WFVERTEX), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    // Load shaders and create VBO/VAO for sprites
+    m_sprite_shader_program = LoadShader("data/shaders/sprite_vs.glsl", "data/shaders/sprite_fs.glsl");
+    glGenVertexArrays(1, &m_sprite_vao);
+    glGenBuffers(1, &m_sprite_vbo);
+    glBindVertexArray(m_sprite_vao);
+    glBindBuffer(GL_ARRAY_BUFFER, m_sprite_vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(SPRITEVERTEX) * 4, NULL, GL_DYNAMIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(SPRITEVERTEX), (void*)0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(SPRITEVERTEX), (void*)offsetof(SPRITEVERTEX, Diffuse));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(SPRITEVERTEX), (void*)offsetof(SPRITEVERTEX, tu));
+    glEnableVertexAttribArray(2);
+
+
     if (!m_bInitialPresetSelected)
     {
 		UpdatePresetList(true);
@@ -388,6 +425,18 @@ void CPlugin::CleanUpMyDX9Stuff(int final_cleanup)
     {
         //WritePrivateProfileInt(m_bPresetLockedByUser, "bPresetLockOnAtStartup", GetConfigIniFile(), "settings");
     }
+
+    glDeleteVertexArrays(1, &m_wave_vao);
+    glDeleteBuffers(1, &m_wave_vbo);
+    glDeleteProgram(m_wave_shader_program);
+
+    glDeleteVertexArrays(1, &m_shape_vao);
+    glDeleteBuffers(1, &m_shape_vbo);
+    glDeleteProgram(m_shape_shader_program);
+
+    glDeleteVertexArrays(1, &m_sprite_vao);
+    glDeleteBuffers(1, &m_sprite_vbo);
+    glDeleteProgram(m_sprite_shader_program);
 }
 
 void CPlugin::MyRenderFn(int redraw)
@@ -433,6 +482,38 @@ void CPlugin::MyRenderUI(int *upper_left_corner_y, int *upper_right_corner_y, in
 
 void CPlugin::MyKeyHandler(int key)
 {
+    // This is a basic implementation to handle key presses.
+    // It can be expanded to handle more complex interactions.
+    if (m_bShowMenu)
+    {
+        m_pCurMenu->HandleKeydown(key);
+    }
+    else
+    {
+        // Handle regular keys when menu is not shown
+        HandleRegularKey(key);
+    }
+}
+
+int CPlugin::HandleRegularKey(WPARAM wParam)
+{
+    // This is a simplified key handler. A more robust implementation would
+    // be needed to handle all of MilkDrop's keyboard shortcuts.
+    switch(wParam)
+    {
+        case 'L':
+            m_bShowMenu = true;
+            break;
+        case 'R':
+            LoadRandomPreset(m_fBlendTimeUser);
+            break;
+        case 'H':
+            LoadRandomPreset(0.0f);
+            break;
+        default:
+            return 0; // unhandled
+    }
+    return 1; // handled
 }
 void CPlugin::GetSongTitle(char *szSongTitle, int nSize)
 {

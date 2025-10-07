@@ -214,6 +214,8 @@ private:
     int  GetCanvasMarginY();
 public:
     void DrawDarkTranslucentBox(RECT* pr);
+    unsigned int LoadShader(const char* vs_file, const char* fs_file);
+    unsigned int LoadShaderFromStrings(const char* vs_source, const char* fs_source);
 protected:
     void RenderPlaylist();
     void StuffParams(void* pParams);

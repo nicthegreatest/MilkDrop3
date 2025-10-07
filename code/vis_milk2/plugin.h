@@ -376,6 +376,7 @@ public:
         D3DXVECTOR4 m_rand_frame;  // 4 random floats (0..1); randomized once per frame; fed to pixel shaders.
 
         // RUNTIME SETTINGS THAT WE'VE ADDED
+        bool        m_bShowMenu;
         float       m_prev_time;
         bool		m_bTexSizeWasAutoPow2;
 		bool        m_bTexSizeWasAutoExact;

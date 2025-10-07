@@ -37,6 +37,9 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>
 #include <math.h>
 #include <wchar.h>
+#include <string>
+#include <fstream>
+#include <sstream>
 
 #include <GLFW/glfw3.h>
 
@@ -46,6 +49,97 @@ int g_szHelp_W = 0;
 CPluginShell::CPluginShell()
 {
 	// this should remain empty!
+}
+
+unsigned int CPluginShell::LoadShader(const char* vs_file, const char* fs_file)
+{
+    char vs_path[256];
+    char fs_path[256];
+    sprintf(vs_path, "%s%s", GetPluginsDirPath(), vs_file);
+    sprintf(fs_path, "%s%s", GetPluginsDirPath(), fs_file);
+
+    std::string vertexCode;
+    std::string fragmentCode;
+    std::ifstream vShaderFile;
+    std::ifstream fShaderFile;
+
+    vShaderFile.exceptions (std::ifstream::failbit | std::ifstream::badbit);
+    fShaderFile.exceptions (std::ifstream::failbit | std::ifstream::badbit);
+    try
+    {
+        vShaderFile.open(vs_path);
+        fShaderFile.open(fs_path);
+        std::stringstream vShaderStream, fShaderStream;
+        vShaderStream << vShaderFile.rdbuf();
+        fShaderStream << fShaderFile.rdbuf();
+        vShaderFile.close();
+        fShaderFile.close();
+        vertexCode = vShaderStream.str();
+        fragmentCode = fShaderStream.str();
+    }
+    catch (std::ifstream::failure e)
+    {
+        printf("ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ\n");
+        return 0;
+    }
+    const char* vShaderCode = vertexCode.c_str();
+    const char* fShaderCode = fragmentCode.c_str();
+
+    return LoadShaderFromStrings(vShaderCode, fShaderCode);
+}
+
+unsigned int CPluginShell::LoadShaderFromStrings(const char* vs_source, const char* fs_source)
+{
+    // 2. compile shaders
+    unsigned int vertex, fragment;
+    int success;
+    char infoLog[512];
+
+    // vertex Shader
+    vertex = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertex, 1, &vs_source, NULL);
+    glCompileShader(vertex);
+    // check for shader compile errors
+    glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
+    if(!success)
+    {
+        glGetShaderInfoLog(vertex, 512, NULL, infoLog);
+        printf("ERROR::SHADER::VERTEX::COMPILATION_FAILED\n%s\n", infoLog);
+        return 0;
+    };
+
+    // fragment Shader
+    fragment = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragment, 1, &fs_source, NULL);
+    glCompileShader(fragment);
+    // check for shader compile errors
+    glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
+    if(!success)
+    {
+        glGetShaderInfoLog(fragment, 512, NULL, infoLog);
+        printf("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n%s\n", infoLog);
+        return 0;
+    };
+
+    // shader Program
+    unsigned int ID = glCreateProgram();
+    glAttachShader(ID, vertex);
+    glAttachShader(ID, fragment);
+    glLinkProgram(ID);
+    // check for linking errors
+    glGetProgramiv(ID, GL_LINK_STATUS, &success);
+    if(!success)
+    {
+        glGetProgramInfoLog(ID, 512, NULL, infoLog);
+        printf("ERROR::SHADER::PROGRAM::LINKING_FAILED\n%s\n", infoLog);
+        return 0;
+    }
+
+    // delete the shaders as they're linked into our program now and no longer necessary
+    glDeleteShader(vertex);
+    glDeleteShader(fragment);
+
+    return ID;
 }
 
 CPluginShell::~CPluginShell()
