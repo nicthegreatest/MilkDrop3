@@ -32,6 +32,8 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "support.h"
 #include "plugin.h"
 #include "utility.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 texmgr::texmgr()
 {
@@ -39,7 +41,6 @@ texmgr::texmgr()
 
 texmgr::~texmgr()
 {
-	// DO NOT RELEASE OR DELETE m_lpDD; CLIENT SHOULD DO THIS!
 }
 
 void texmgr::Finish()
@@ -49,17 +50,13 @@ void texmgr::Finish()
 		KillTex(i);
 		NSEEL_VM_free(m_tex[i].tex_eel_ctx);
 	}
-
-	// DO NOT RELEASE OR DELETE m_lpDD; CLIENT SHOULD DO THIS!
 }
 
-void texmgr::Init(LPDIRECT3DDEVICE9 lpDD)
+void texmgr::Init()
 {
-	m_lpDD = lpDD;
-
 	for (int i=0; i<NUM_TEX; i++)
 	{
-		m_tex[i].pSurface = NULL;
+		m_tex[i].pSurface = 0;
 		m_tex[i].szFileName[0] = 0;
 		m_tex[i].m_codehandle = NULL;
 		m_tex[i].m_szExpr[0] = 0;
@@ -74,19 +71,17 @@ int texmgr::LoadTex(const char *szFilename, int iSlot, char *szInitCode, char *s
 
 	// first, if this texture is already loaded, just add another instance.
 	bool bTextureInstanced = false;
-#ifdef _WIN32
-	{
-		for (int x=0; x<NUM_TEX; x++)
-			if (m_tex[x].pSurface && _stricmp(m_tex[x].szFileName, szFilename)==0)
-			{
-				memcpy(&m_tex[iSlot], &m_tex[x], sizeof(td_texture_info));
-				m_tex[iSlot].m_szExpr[0] = 0;
-				m_tex[iSlot].m_codehandle  = 0;
+    for (int x=0; x<NUM_TEX; x++) {
+        if (m_tex[x].pSurface && strcmp(m_tex[x].szFileName, szFilename)==0)
+        {
+            memcpy(&m_tex[iSlot], &m_tex[x], sizeof(td_texture_info));
+            m_tex[iSlot].m_szExpr[0] = 0;
+            m_tex[iSlot].m_codehandle  = 0;
 
-				bTextureInstanced = true;
-				break;
-			}
-	}
+            bTextureInstanced = true;
+            break;
+        }
+    }
 
 	if (!bTextureInstanced)
 	{
@@ -95,40 +90,22 @@ int texmgr::LoadTex(const char *szFilename, int iSlot, char *szInitCode, char *s
 
 		strcpy(m_tex[iSlot].szFileName, szFilename);
 
-        D3DXIMAGE_INFO info;
-        HRESULT hr = D3DXCreateTextureFromFileExA(
-          m_lpDD,
-          szFilename,
-          D3DX_DEFAULT,
-          D3DX_DEFAULT,
-          D3DX_DEFAULT, // create a mip chain
-          0,
-          D3DFMT_UNKNOWN,
-          D3DPOOL_DEFAULT,
-          D3DX_DEFAULT,
-          D3DX_DEFAULT,
-          0xFF000000 | ck,
-          &info,
-          NULL,
-          &m_tex[iSlot].pSurface
-        );
-
-        if (hr != D3D_OK)
+        int width, height, nrChannels;
+        unsigned char *data = stbi_load(szFilename, &width, &height, &nrChannels, 0);
+        if (data)
         {
-            switch(hr)
-            {
-            case E_OUTOFMEMORY:
-            case D3DERR_OUTOFVIDEOMEMORY:
-                return TEXMGR_ERR_OUTOFMEM;
-            default:
-			    return TEXMGR_ERR_BADFILE;
-            }
+            glGenTextures(1, &m_tex[iSlot].pSurface);
+            glBindTexture(GL_TEXTURE_2D, m_tex[iSlot].pSurface);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            stbi_image_free(data);
+            m_tex[iSlot].img_w = width;
+		    m_tex[iSlot].img_h = height;
+        } else {
+            return TEXMGR_ERR_BADFILE;
         }
-
-        m_tex[iSlot].img_w = info.Width;
-		m_tex[iSlot].img_h = info.Height;
 	}
-#endif
 
 	m_tex[iSlot].fStartTime = time;
 	m_tex[iSlot].nStartFrame = frame;
@@ -145,8 +122,6 @@ int texmgr::LoadTex(const char *szFilename, int iSlot, char *szInitCode, char *s
 	if (!RecompileExpressions(iSlot))
 		ret |= TEXMGR_WARN_ERROR_IN_REG_CODE;
 
-	//g_dumpmsg("texmgr: success");
-
 	return ret;
 }
 
@@ -155,8 +130,6 @@ void texmgr::KillTex(int iSlot)
 	if (iSlot < 0) return;
 	if (iSlot >= NUM_TEX) return;
 
-#ifdef _WIN32
-	// Free old resources:
 	if (m_tex[iSlot].pSurface)
 	{
 		// first, make sure no other sprites reference this texture!
@@ -166,10 +139,9 @@ void texmgr::KillTex(int iSlot)
 				refcount++;
 
 		if (refcount==1)
-			((LPDIRECT3DTEXTURE9)m_tex[iSlot].pSurface)->Release();
-		m_tex[iSlot].pSurface = NULL;
+			glDeleteTextures(1, &m_tex[iSlot].pSurface);
+		m_tex[iSlot].pSurface = 0;
 	}
-#endif
 	m_tex[iSlot].szFileName[0] = 0;
 
 	FreeCode(iSlot);
@@ -259,7 +231,10 @@ bool texmgr::RecompileExpressions(int iSlot)
 	char buf[sizeof(m_tex[iSlot].m_szExpr)];
 	StripLinefeedCharsAndComments(expr, buf);
 
-	return true;
+    if (m_tex[iSlot].m_codehandle) NSEEL_code_free(m_tex[iSlot].m_codehandle);
+    m_tex[iSlot].m_codehandle = NSEEL_code_compile(m_tex[iSlot].tex_eel_ctx, (unsigned char*)buf);
+
+	return (m_tex[iSlot].m_codehandle != NULL);
 }
 
 void texmgr::FreeVars(int iSlot)
@@ -315,4 +290,19 @@ void texmgr::RegisterBuiltInVariables(int iSlot)
 	m_tex[iSlot].var_burn        = NSEEL_VM_regvar(eel_ctx, "burn");
 
 //	resetVars(NULL);
+}
+
+void texmgr::SetTex(int iSlot)
+{
+    // This is a stub.
+}
+
+void texmgr::SetUserTex(int iSlot, GLuint pTex)
+{
+    // This is a stub.
+}
+
+void texmgr::SetUserTex(int iSlot, const char* szFilename)
+{
+    // This is a stub.
 }

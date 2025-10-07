@@ -59,4 +59,7 @@ void    GetDesktopFolder(char *szDesktopFolder); // should be MAX_PATH len.
 
 intptr_t myOpenURL(void* hwnd, const char *loc);
 
+unsigned int LoadShader(const char* vertexPath, const char* fragmentPath);
+unsigned int LoadShaderFromStrings(const char* vShaderCode, const char* fShaderCode);
+
 #endif

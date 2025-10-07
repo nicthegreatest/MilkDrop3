@@ -32,6 +32,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "shell_defines.h"
 #include "../ns-eel2/ns-eel.h"
+#include "glad.h"
 
 #define NUM_TEX 16
 
@@ -49,17 +50,16 @@ public:
 	texmgr();
 	~texmgr();
 
-	void Init(LPDIRECT3DDEVICE9 lpDevice);
+	void Init();
 	void Finish();
 
 	void KillTex(int iSlot);
     int LoadTex(const char* szFilename, int iSlot, char *szInitCode, char *szCode, float time, int frame, unsigned int ck);
 	void SetTex(int iSlot);
-    void SetUserTex(int iSlot, LPDIRECT3DTEXTURE9 pTex);
+    void SetUserTex(int iSlot, GLuint pTex);
     void SetUserTex(int iSlot, const char* szFilename);
 
 protected:
-	LPDIRECT3DDEVICE9 m_lpDD;
     void StripLinefeedCharsAndComments(char *src, char *dest);
     bool RunInitCode(int iSlot, char *szInitCode);
     bool RecompileExpressions(int iSlot);
@@ -70,7 +70,7 @@ protected:
 public:
 	typedef struct
 	{
-		LPDIRECT3DTEXTURE9 pSurface;
+		GLuint pSurface;
 		char          szFileName[MAX_PATH];
         char          m_szExpr[768];
 		int           nLoaded;	// 0 for not loaded, 1 for loaded, 2 for failed.

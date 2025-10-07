@@ -1,11 +1,19 @@
 cmake_minimum_required(VERSION 3.10)
 project(MilkDrop3)
 
+cmake_policy(SET CMP0072 NEW)
+
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g")
+
+# Set compiler-specific flags
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX)
+    set(CMAKE_CXX_FLAGS_DEBUG "-g")
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
+    set(CMAKE_C_FLAGS_DEBUG "-g")
+    set(CMAKE_C_FLAGS_RELEASE "-O3 -DNDEBUG")
+endif()
 
 # Define source files
 set(AUDIO_SOURCES
@@ -113,6 +121,12 @@ set(VIS_MILK2_SOURCES
     vis_milk2/glad.c
 )
 
+set(ALL_SOURCES
+    ${AUDIO_SOURCES}
+    ${NSEEL_SOURCES}
+    ${VIS_MILK2_SOURCES}
+)
+
 # Add executable
 add_executable(milkdrop3
     ${AUDIO_SOURCES}
@@ -126,21 +140,21 @@ target_include_directories(milkdrop3 PUBLIC
     "${PROJECT_SOURCE_DIR}/ns-eel2"
     "${PROJECT_SOURCE_DIR}/vis_milk2"
     "${PROJECT_SOURCE_DIR}/ns-eel2/numericSys/HPFloat"
-    /usr/include/
-    ${OPENGL_INCLUDE_DIR}
-    ${glfw3_INCLUDE_DIRS}
     ${PORTAUDIO_INCLUDE_DIRS}
-    ${FREETYPE_INCLUDE_DIRS}
-    ${glm_INCLUDE_DIRS}
 )
 
 # Link libraries
-target_link_libraries(milkdrop3
-    ${OPENGL_LIBRARIES}
+target_link_libraries(milkdrop3 PRIVATE
+    OpenGL::GL
     glfw
     ${PORTAUDIO_LIBRARIES}
-    ${FREETYPE_LIBRARIES}
+    Freetype::Freetype
+    glm::glm
 )
 
 # Copy data files to the build directory
 file(COPY resources/Milkdrop2/data/ DESTINATION ${CMAKE_BINARY_DIR}/data)
+file(COPY ${CMAKE_SOURCE_DIR}/../data/ DESTINATION ${CMAKE_BINARY_DIR}/data)
+
+install(TARGETS milkdrop3 DESTINATION bin)
+install(DIRECTORY ${CMAKE_BINARY_DIR}/data/ DESTINATION share/milkdrop3)

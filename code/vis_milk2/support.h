@@ -31,79 +31,20 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __NULLSOFT_DX9_EXAMPLE_PLUGIN_SUPPORT_H__ 1
 
 #include "shell_defines.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
-#ifdef _WIN32
 
-#include <d3dx9.h>
-
-void MakeWorldMatrix( D3DXMATRIX* pOut,
+void MakeWorldMatrix( glm::mat4* pOut,
                       float xpos, float ypos, float zpos,
                       float sx,   float sy,   float sz,
                       float pitch, float yaw, float roll);
-void MakeProjectionMatrix( D3DXMATRIX* pOut,
+void MakeProjectionMatrix( glm::mat4* pOut,
                            const float near_plane, // Distance to near clipping plane
                            const float far_plane,  // Distance to far clipping plane
                            const float fov_horiz,  // Horizontal field of view angle, in radians
                            const float fov_vert);   // Vertical field of view angle, in radians
-void PrepareFor3DDrawing(
-        IDirect3DDevice9 *pDevice,
-        int viewport_width,
-        int viewport_height,
-        float fov_in_degrees,
-        float near_clip,
-        float far_clip,
-        D3DXVECTOR3* pvEye,
-        D3DXVECTOR3* pvLookat,
-        D3DXVECTOR3* pvUp
-    );
-void PrepareFor2DDrawing(IDirect3DDevice9 *pDevice);
 
-// Define vertex formats you'll be using here:
-// note: layout must match the vertex declaration in plugin.cpp!
-typedef struct _MYVERTEX
-{
-    float x, y, z;     // screen position + Z-buffer depth
-    DWORD Diffuse;     // diffuse color
-    float tu, tv;           // DYNAMIC
-     float tu_orig, tv_orig; // STATIC
-    float rad, ang;         // STATIC
-} MYVERTEX, *LPMYVERTEX;
-
-// note: layout must match the vertex declaration in plugin.cpp!
-typedef struct _WFVERTEX
-{
-    float x, y, z;
-    DWORD Diffuse;   // diffuse color. also acts as filler; aligns struct to 16 bytes (good for random access/indexed prims)
-} WFVERTEX, *LPWFVERTEX;
-
-// note: layout must match the vertex declaration in plugin.cpp!
-typedef struct _SPRITEVERTEX
-{
-    float x, y;      // screen position
-    float z;         // Z-buffer depth
-    DWORD Diffuse;   // diffuse color. also acts as filler; aligns struct to 16 bytes (good for random access/indexed prims)
-    float tu, tv;    // texture coordinates for texture #0
-} SPRITEVERTEX, *LPSPRITEVERTEX;
-
-#define MYVERTEX_FORMAT     (D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX3 | D3DFVF_TEXCOORDSIZE2(0) | D3DFVF_TEXCOORDSIZE2(1) | D3DFVF_TEXCOORDSIZE2(2))
-#define WFVERTEX_FORMAT     (D3DFVF_XYZ | D3DFVF_DIFFUSE              )
-#define SPRITEVERTEX_FORMAT (D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1 | D3DFVF_TEXCOORDSIZE2(0) )
-
-int GetDX9TexFormatBitsPerPixel(D3DFORMAT fmt);
-
-//#define PROFILING
-#ifdef PROFILING
-    #define PROFILE_BEGIN    LARGE_INTEGER tx, freq, ty; QueryPerformanceCounter(&tx); QueryPerformanceFrequency(&freq);
-    #define PROFILE_END(s)   { QueryPerformanceCounter(&ty); float dt = (float)((double)(ty.QuadPart - tx.QuadPart) / (double)freq.QuadPart); char buf[256]; sprintf(buf, "  %s = %.1f ms\n", s, dt*1000 ); OutputDebugString(buf); tx = ty; }
-#else
-    #define PROFILE_BEGIN
-    #define PROFILE_END(s)
-#endif
-
-#else
-
-// Non-windows stubs
-// DWORD is now defined in pluginshell.h
 
 // Define vertex formats you'll be using here:
 typedef struct _MYVERTEX
@@ -134,6 +75,4 @@ typedef struct _SPRITEVERTEX
 #define PROFILE_BEGIN
 #define PROFILE_END(s)
 
-#endif // _WIN32
-
-#endif
+#endif // __NULLSOFT_DX9_EXAMPLE_PLUGIN_SUPPORT_H__
