@@ -113,9 +113,6 @@ bool CPlugin::RenderStringToTitleTexture()	// m_szSongMessage
 	if (m_supertext.szTextW[0]==0)
 		return false;
 
-    LPDIRECT3DDEVICE9 lpDevice = GetDevice();
-    if (!lpDevice)
-        return false;
 
 	wchar_t szTextToDraw[512];
 	swprintf(szTextToDraw, 512, L" %s ", m_supertext.szTextW);
@@ -442,9 +439,6 @@ void CPlugin::RenderFrame(int bRedraw)
 
 	RunPerFrameEquations(code);
 
-    LPDIRECT3DDEVICE9 lpDevice = GetDevice();
-    if (!lpDevice)
-        return;
 
     DrawMotionVectors();
 	DrawCustomShapes();

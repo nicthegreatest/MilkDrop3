@@ -33,7 +33,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
     if (action == GLFW_PRESS || action == GLFW_REPEAT)
     {
         // This is a simplified mapping. A more robust solution would be needed for full compatibility.
-        g_plugin->PluginShellWindowProc(NULL, WM_KEYDOWN, key, 0);
+        g_plugin->MyKeyHandler(key);
     }
 }
 

@@ -522,6 +522,17 @@ public:
         MYVERTEX    m_comp_verts[FCGSX*FCGSY];
         int         m_comp_indices[(FCGSX-2)*(FCGSY-2)*2*3];
 
+        // OpenGL resources
+        unsigned int m_wave_vao;
+        unsigned int m_wave_vbo;
+        unsigned int m_wave_shader_program;
+        unsigned int m_shape_vao;
+        unsigned int m_shape_vbo;
+        unsigned int m_shape_shader_program;
+        unsigned int m_sprite_vao;
+        unsigned int m_sprite_vbo;
+        unsigned int m_sprite_shader_program;
+
         bool		m_bMMX;
         //bool		m_bSSE;
         bool        m_bHasFocus;
