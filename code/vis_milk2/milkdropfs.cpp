@@ -526,6 +526,82 @@ void CPlugin::WarpedBlit_Shaders(int nPass, bool bAlphaBlend, bool bFlipAlpha, b
 
 void CPlugin::DrawCustomShapes()
 {
+    int num_reps = (m_pState->m_bBlending) ? 2 : 1;
+    for (int rep = 0; rep < num_reps; rep++)
+    {
+        CState* pState = (rep == 0) ? m_pState : m_pOldState;
+        float alpha_mult = 1.0f;
+        if (num_reps == 2)
+        {
+            alpha_mult = (rep == 0) ? CosineInterp(m_pState->m_fBlendProgress) : (1.0f - CosineInterp(m_pState->m_fBlendProgress));
+        }
+
+        for (int i = 0; i < MAX_CUSTOM_SHAPES; i++)
+        {
+            if (pState->m_shape[i].enabled)
+            {
+                for (int instance = 0; instance < pState->m_shape[i].instances; instance++)
+                {
+                    LoadCustomShapePerFrameEvallibVars(pState, i, instance);
+
+                    if (pState->m_shape[i].m_pf_codehandle)
+                    {
+                        NSEEL_code_execute(pState->m_shape[i].m_pf_codehandle);
+                    }
+
+                    float a = *pState->m_shape[i].var_pf_a * alpha_mult;
+                    if (a < 0.001f)
+                        continue;
+
+                    int sides = (int)(*pState->m_shape[i].var_pf_sides);
+                    if (sides < 3) sides = 3;
+                    if (sides > 100) sides = 100;
+
+                    WFVERTEX v[102]; // 100 sides + center + first vertex
+                    float x = (float)(*pState->m_shape[i].var_pf_x * 2.0 - 1.0);
+                    float y = (float)(*pState->m_shape[i].var_pf_y * -2.0 + 1.0);
+                    float rad = (float)*pState->m_shape[i].var_pf_rad;
+                    float ang = (float)*pState->m_shape[i].var_pf_ang;
+
+                    v[0].x = x;
+                    v[0].y = y;
+                    v[0].z = 0.0f;
+                    v[0].Diffuse = 0;
+
+                    for (int j = 0; j <= sides; j++)
+                    {
+                        float t = j / (float)sides;
+                        v[j+1].x = x + rad * cosf(t * 6.283185f + ang) * m_fAspectY;
+                        v[j+1].y = y + rad * sinf(t * 6.283185f + ang);
+                        v[j+1].z = 0.0f;
+                        v[j+1].Diffuse = 0;
+                    }
+
+                    glUseProgram(m_shape_shader_program);
+                    int color_loc = glGetUniformLocation(m_shape_shader_program, "u_color");
+                    glUniform4f(color_loc,
+                                (float)*pState->m_shape[i].var_pf_r,
+                                (float)*pState->m_shape[i].var_pf_g,
+                                (float)*pState->m_shape[i].var_pf_b,
+                                a);
+
+                    if (*pState->m_shape[i].var_pf_additive > 0.5)
+                        glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+                    else
+                        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+                    glBindVertexArray(m_shape_vao);
+                    glBindBuffer(GL_ARRAY_BUFFER, m_shape_vbo);
+                    glBufferData(GL_ARRAY_BUFFER, sizeof(WFVERTEX) * (sides + 2), v, GL_DYNAMIC_DRAW);
+                    glDrawArrays(GL_TRIANGLE_FAN, 0, sides + 2);
+                }
+            }
+        }
+    }
+    // Restore default blend func
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glUseProgram(0);
+    glBindVertexArray(0);
 }
 
 void CPlugin::LoadCustomShapePerFrameEvallibVars(CState* pState, int i, int instance)
@@ -547,10 +623,167 @@ void CPlugin::DrawCustomWaves()
 
 void CPlugin::DrawWave(float *fL, float *fR)
 {
+    WFVERTEX v[576];
+    float cr = (float)(*m_pState->var_pf_wave_r);
+    float cg = (float)(*m_pState->var_pf_wave_g);
+    float cb = (float)(*m_pState->var_pf_wave_b);
+    float ca = (float)(*m_pState->var_pf_wave_a);
+
+    if (ca < 0.001f)
+        return;
+
+    for (int i = 0; i < 576; i++)
+    {
+        v[i].x = (i / 288.0f) - 1.0f;
+        v[i].y = fL[i];
+        v[i].z = 0.0f;
+        v[i].Diffuse = 0xFFFFFFFF;
+    }
+
+    glUseProgram(m_wave_shader_program);
+    int color_loc = glGetUniformLocation(m_wave_shader_program, "u_color");
+    glUniform4f(color_loc, cr, cg, cb, ca);
+
+    glBindVertexArray(m_wave_vao);
+    glBindBuffer(GL_ARRAY_BUFFER, m_wave_vbo);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(v), v);
+
+    if (*m_pState->var_pf_wave_usedots > 0.5)
+    {
+        glDrawArrays(GL_POINTS, 0, 576);
+    }
+    else
+    {
+        if (*m_pState->var_pf_wave_thick > 0.5)
+            glLineWidth(2.0f);
+        else
+            glLineWidth(1.0f);
+        glDrawArrays(GL_LINE_STRIP, 0, 576);
+    }
+
+    glBindVertexArray(0);
+    glUseProgram(0);
+    glLineWidth(1.0f);
 }
 
 void CPlugin::DrawSprites()
 {
+    bool bSpritesToDraw = false;
+    for (int i = 0; i < NUM_TEX; i++)
+    {
+        if (m_texmgr.m_tex[i].nLoaded == 1)
+        {
+            bSpritesToDraw = true;
+            break;
+        }
+    }
+    if (!bSpritesToDraw)
+        return;
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glUseProgram(m_sprite_shader_program);
+    glBindVertexArray(m_sprite_vao);
+    glBindBuffer(GL_ARRAY_BUFFER, m_sprite_vbo);
+
+    for (int i = 0; i < NUM_TEX; i++)
+    {
+        if (m_texmgr.m_tex[i].nLoaded != 1)
+            continue;
+
+        if (m_texmgr.m_tex[i].m_codehandle)
+        {
+            *m_texmgr.m_tex[i].var_time = (double)(GetTime() - m_texmgr.m_tex[i].fStartTime);
+            *m_texmgr.m_tex[i].var_frame = (double)(GetFrame() - m_texmgr.m_tex[i].nStartFrame);
+            *m_texmgr.m_tex[i].var_fps = (double)GetFps();
+            *m_texmgr.m_tex[i].var_progress = (GetTime() - m_fPresetStartTime) / (m_fNextPresetTime - m_fPresetStartTime);
+            *m_texmgr.m_tex[i].var_bass = (double)mysound.imm_rel[0];
+            *m_texmgr.m_tex[i].var_mid = (double)mysound.imm_rel[1];
+            *m_texmgr.m_tex[i].var_treb = (double)mysound.imm_rel[2];
+            *m_texmgr.m_tex[i].var_bass_att = (double)mysound.avg_rel[0];
+            *m_texmgr.m_tex[i].var_mid_att = (double)mysound.avg_rel[1];
+            *m_texmgr.m_tex[i].var_treb_att = (double)mysound.avg_rel[2];
+            *m_texmgr.m_tex[i].var_done = 0;
+            *m_texmgr.m_tex[i].var_burn = 0;
+
+            NSEEL_code_execute(m_texmgr.m_tex[i].m_codehandle);
+
+            if (*m_texmgr.m_tex[i].var_done > 0.5f)
+            {
+                KillSprite(i);
+                continue;
+            }
+        }
+
+        SPRITEVERTEX v[4];
+
+        float x = *m_texmgr.m_tex[i].var_x;
+        float y = *m_texmgr.m_tex[i].var_y;
+        float sx = *m_texmgr.m_tex[i].var_sx;
+        float sy = *m_texmgr.m_tex[i].var_sy;
+        float rot = *m_texmgr.m_tex[i].var_rot;
+        float r = *m_texmgr.m_tex[i].var_r;
+        float g = *m_texmgr.m_tex[i].var_g;
+        float b = *m_texmgr.m_tex[i].var_b;
+        float a = *m_texmgr.m_tex[i].var_a;
+        bool flipx = (*m_texmgr.m_tex[i].var_flipx > 0.5f);
+        bool flipy = (*m_texmgr.m_tex[i].var_flipy > 0.5f);
+        int blendmode = (int)(*m_texmgr.m_tex[i].var_blendmode + 0.5f);
+
+        if (blendmode == 1)
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+        else
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        unsigned char R = (unsigned char)(std::max(0.0f, std::min(1.0f, r)) * 255.0f);
+        unsigned char G = (unsigned char)(std::max(0.0f, std::min(1.0f, g)) * 255.0f);
+        unsigned char B = (unsigned char)(std::max(0.0f, std::min(1.0f, b)) * 255.0f);
+        unsigned char A = (unsigned char)(std::max(0.0f, std::min(1.0f, a)) * 255.0f);
+        for (int j = 0; j < 4; j++)
+            v[j].Diffuse = (A << 24) | (R << 16) | (G << 8) | B;
+
+        float u1 = 0, u2 = 1, v_1 = 0, v2 = 1;
+        if (flipx) { u1 = 1; u2 = 0; }
+        if (flipy) { v_1 = 1; v2 = 0; }
+        v[0].tu = u1; v[0].tv = v_1;
+        v[1].tu = u2; v[1].tv = v_1;
+        v[2].tu = u1; v[2].tv = v2;
+        v[3].tu = u2; v[3].tv = v2;
+
+        float p[4][2] = {
+            {-0.5f, -0.5f}, { 0.5f, -0.5f},
+            {-0.5f,  0.5f}, { 0.5f,  0.5f}
+        };
+        float cos_rot = cosf(rot);
+        float sin_rot = sinf(rot);
+        for (int j = 0; j < 4; j++)
+        {
+            float px = p[j][0] * sx;
+            float py = p[j][1] * sy;
+            float prx = px * cos_rot - py * sin_rot;
+            float pry = px * sin_rot + py * cos_rot;
+            prx *= m_fAspectY;
+            v[j].x = prx + (x * 2.0f - 1.0f);
+            v[j].y = pry + (y * -2.0f + 1.0f);
+            v[j].z = 0;
+        }
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, (GLuint)(uintptr_t)m_texmgr.m_tex[i].pSurface);
+
+        bool repeatx = (*m_texmgr.m_tex[i].var_repeatx > 0.5f);
+        bool repeaty = (*m_texmgr.m_tex[i].var_repeaty > 0.5f);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, repeatx ? GL_REPEAT : GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, repeaty ? GL_REPEAT : GL_CLAMP_TO_EDGE);
+
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(v), v);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    }
+
+    // Restore default blend func
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glUseProgram(0);
+    glBindVertexArray(0);
 }
 
 void CPlugin::ShowToUser_NoShaders()
