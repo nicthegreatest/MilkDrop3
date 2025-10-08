@@ -64,6 +64,7 @@ public:
 	MENUITEMTYPE	m_type;
 	float			m_fMin;
 	float			m_fMax;
+    float           m_fStep;
     unsigned int    m_wParam;
     unsigned int    m_lParam;
 	MilkMenuCallbackFnPtr m_pCallbackFn;
@@ -86,7 +87,7 @@ public:
     void    Finish();
 	void	AddChildMenu(CMilkMenu *pChildMenu);
 	void	AddItem(const char *szName, void *var, MENUITEMTYPE type, const char *szToolTip,
-					float min=0, float max=0, MilkMenuCallbackFnPtr pCallback=NULL,
+					float min=0, float max=0, float step=0.01f, MilkMenuCallbackFnPtr pCallback=NULL,
                     unsigned int wParam=0, unsigned int lParam=0);
 	void	SetParentPointer(CMilkMenu *pParentMenu) { m_pParentMenu = pParentMenu; }
 	void	HandleKeydown(int key);

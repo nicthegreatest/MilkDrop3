@@ -33,6 +33,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "wasabi.h"
 #include <stdio.h>
 #include <string.h>
+#include <GLFW/glfw3.h>
 #include <math.h>
 #include <assert.h>
 #include "resource.h"
@@ -146,7 +147,7 @@ void CMilkMenu::AddChildMenu(CMilkMenu *pMenu)
 }
 
 void CMilkMenu::AddItem(const char *szName, void *var, MENUITEMTYPE type, const char *szToolTip,
-						float min, float max, MilkMenuCallbackFnPtr pCallback,
+						float min, float max, float step, MilkMenuCallbackFnPtr pCallback,
 						unsigned int wParam, unsigned int lParam)
 {
 	CMilkMenuItem *pLastItem = NULL;
@@ -169,6 +170,7 @@ void CMilkMenu::AddItem(const char *szName, void *var, MENUITEMTYPE type, const 
 	pLastItem->m_type = type;
 	pLastItem->m_fMin = min;
 	pLastItem->m_fMax = max;
+    pLastItem->m_fStep = step;
     pLastItem->m_wParam = wParam;
     pLastItem->m_lParam = lParam;
 	if ((type==MENUITEMTYPE_LOGBLENDABLE || type==MENUITEMTYPE_LOGFLOAT) && min==max)
@@ -234,5 +236,102 @@ void CMilkMenu::OnWaitStringAccept(char *szNewString)
 
 void CMilkMenu::HandleKeydown(int key)
 {
-    // Stubbed out - keyboard handling will be done in main loop
+    int nItems = m_nChildMenus + m_nChildItems;
+    if (nItems == 0) return;
+
+    if (key == GLFW_KEY_UP)
+    {
+        m_nCurSel = (m_nCurSel - 1 + nItems) % nItems;
+    }
+    else if (key == GLFW_KEY_DOWN)
+    {
+        m_nCurSel = (m_nCurSel + 1) % nItems;
+    }
+    else if (key == GLFW_KEY_LEFT)
+    {
+        if (m_nCurSel >= m_nChildMenus)
+        {
+            CMilkMenuItem* pItem = GetCurItem();
+            if (pItem)
+            {
+                size_t addr = pItem->m_var_offset + (size_t)g_plugin->m_pState;
+                switch (pItem->m_type)
+                {
+                    case MENUITEMTYPE_FLOAT:
+                    case MENUITEMTYPE_LOGFLOAT:
+                    case MENUITEMTYPE_BLENDABLE:
+                    case MENUITEMTYPE_LOGBLENDABLE:
+                        *(float*)addr -= pItem->m_fStep * (pItem->m_fMax - pItem->m_fMin);
+                        if (*(float*)addr < pItem->m_fMin) *(float*)addr = pItem->m_fMin;
+                        break;
+                    case MENUITEMTYPE_INT:
+                        *(int*)addr -= 1;
+                        if (*(int*)addr < pItem->m_fMin) *(int*)addr = pItem->m_fMin;
+                        break;
+                }
+            }
+        }
+    }
+    else if (key == GLFW_KEY_RIGHT)
+    {
+        if (m_nCurSel >= m_nChildMenus)
+        {
+            CMilkMenuItem* pItem = GetCurItem();
+            if (pItem)
+            {
+                size_t addr = pItem->m_var_offset + (size_t)g_plugin->m_pState;
+                switch (pItem->m_type)
+                {
+                    case MENUITEMTYPE_FLOAT:
+                    case MENUITEMTYPE_LOGFLOAT:
+                    case MENUITEMTYPE_BLENDABLE:
+                    case MENUITEMTYPE_LOGBLENDABLE:
+                        *(float*)addr += pItem->m_fStep * (pItem->m_fMax - pItem->m_fMin);
+                        if (*(float*)addr > pItem->m_fMax) *(float*)addr = pItem->m_fMax;
+                        break;
+                    case MENUITEMTYPE_INT:
+                        *(int*)addr += 1;
+                        if (*(int*)addr > pItem->m_fMax) *(int*)addr = pItem->m_fMax;
+                        break;
+                }
+            }
+        }
+    }
+    else if (key == GLFW_KEY_ENTER)
+    {
+        if (m_nCurSel < m_nChildMenus)
+        {
+            g_plugin->m_pCurMenu = m_ppChildMenu[m_nCurSel];
+        }
+        else
+        {
+            CMilkMenuItem* pItem = GetCurItem();
+            if (pItem)
+            {
+                if (pItem->m_pCallbackFn)
+                {
+                    pItem->m_pCallbackFn(pItem->m_wParam, pItem->m_lParam);
+                }
+                else
+                {
+                    size_t addr = pItem->m_var_offset + (size_t)g_plugin->m_pState;
+                    if (pItem->m_type == MENUITEMTYPE_BOOL)
+                    {
+                        *(bool*)addr = !*(bool*)addr;
+                    }
+                }
+            }
+        }
+    }
+    else if (key == GLFW_KEY_ESCAPE)
+    {
+        if (m_pParentMenu)
+        {
+            g_plugin->m_pCurMenu = m_pParentMenu;
+        }
+        else
+        {
+            g_plugin->m_bShowMenu = false;
+        }
+    }
 }
