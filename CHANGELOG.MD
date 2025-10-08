@@ -18,6 +18,22 @@ By following these instructions, you will help us maintain a clean, accurate, an
 ## [Unreleased]
 
 ### Added
+- Implemented copying of the `plugins/MilkDrop2/presets` directory to the build directory during the CMake process.
+
+### Changed
+- Modified the initial preset loading and "Load Preset" menu item to load a specific preset (`flexi - bouncing balls [mindblob terraforming] flx roams domikleasing undergraeduhate.milk`) for testing purposes.
+
+### Fixed
+- Resolved multiple definition and undefined reference linker errors by correctly defining `CPlugin::MyRenderFn` and ensuring `CPlugin::RenderFrame` is only defined once.
+- Corrected the logic for "Next Preset" and "Previous Preset" menu items to cycle through presets instead of loading random ones.
+- Corrected the texture coordinates in `TextRenderer::RenderText` to fix the horizontally reversed text issue.
+- Ensured the UI elements are rendered by adding a call to `CPlugin::MyRenderUI` in the main application loop.
+
+### Documentation
+- Updated `README.md` to include a proper section for project documentation.
+- Ensured `TODO.MD` is tracked by version control.
+
+### Added
 - Implemented the full menu system, including the main menu and sub-menus for Wave, Custom Waves, Custom Shapes, Motion, and Post Processing.
 - Populated all menus with their respective controls, linking them to the application's state variables.
 - Implemented full keyboard navigation for the menu system, including up/down for selection, left/right for value changes, Enter for activation, and Escape for exiting.
@@ -31,10 +47,6 @@ By following these instructions, you will help us maintain a clean, accurate, an
 ### Fixed
 - Resolved all compiler warnings, including `const`-correctness issues and potential buffer overflows.
 - Fixed several build errors to get the project to compile successfully.
-
-### Documentation
-- Updated `README.md` to include a proper section for project documentation.
-- Ensured `TODO.MD` is tracked by version control.
 
 ## [0.2.0] - 2025-10-07
 

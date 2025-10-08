@@ -156,6 +156,7 @@ target_link_libraries(milkdrop3 PRIVATE
 # Copy data files to the build directory
 file(COPY resources/Milkdrop2/data/ DESTINATION ${CMAKE_BINARY_DIR}/data)
 file(COPY ${CMAKE_SOURCE_DIR}/../data/ DESTINATION ${CMAKE_BINARY_DIR}/data)
+file(COPY ${CMAKE_SOURCE_DIR}/../plugins/MilkDrop2/presets/ DESTINATION ${CMAKE_BINARY_DIR}/plugins/MilkDrop2/presets/)
 
 install(TARGETS milkdrop3 DESTINATION bin)
 install(DIRECTORY ${CMAKE_BINARY_DIR}/data/ DESTINATION share/milkdrop3)

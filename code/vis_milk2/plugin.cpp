@@ -495,7 +495,7 @@ int CPlugin::AllocateMyDX9Stuff()
     if (!m_bInitialPresetSelected)
     {
 		UpdatePresetList(true);
-        LoadRandomPreset(0.0f);
+        LoadPreset("plugins/MilkDrop2/presets/flexi - bouncing balls [mindblob terraforming] flx roams domikleasing undergraeduhate.milk", 0.0f);
         m_bInitialPresetSelected = true;
     }
     return true;
@@ -561,7 +561,8 @@ void CPlugin::MyRenderFn(int redraw)
         }
     }
     DoCustomSoundAnalysis();
-    RenderFrame(redraw);
+    // The actual rendering is done in milkdropfs.cpp::RenderFrame
+    // RenderFrame(redraw);
     if (!redraw)
     {
         m_nFramesSinceResize++;
@@ -571,6 +572,7 @@ void CPlugin::MyRenderFn(int redraw)
         }
     }
 }
+
 
 void CPlugin::MyRenderUI(int *upper_left_corner_y, int *upper_right_corner_y, int *lower_left_corner_y, int *lower_right_corner_y, int xL, int xR)
 {
@@ -582,6 +584,7 @@ void CPlugin::MyRenderUI(int *upper_left_corner_y, int *upper_right_corner_y, in
 
 void CPlugin::MyKeyHandler(int key)
 {
+    // printf("MyKeyHandler: key=%d\n", key);
     // This is a basic implementation to handle key presses.
     // It can be expanded to handle more complex interactions.
     if (m_bShowMenu)
@@ -678,6 +681,7 @@ void CPlugin::LoadRandomPreset(float fBlendTime)
 }
 void CPlugin::LoadPreset(const char *szPresetFilename, float fBlendTime)
 {
+    printf("Loading preset: %s\n", szPresetFilename);
     m_pState->Import(szPresetFilename, GetTime(), m_pOldState, STATE_ALL);
     m_fPresetStartTime = GetTime();
     m_fNextPresetTime = -1.0f;
@@ -718,13 +722,13 @@ void CPlugin::BuildMenus()
 {
     // Main Menu
     m_menuPreset.Init("Main Menu");
-    m_menuPreset.AddItem("Load Preset", NULL, MENUITEMTYPE_BUNK, "Load a preset from disk", 0, 0, LoadPreset_Callback);
-    m_menuPreset.AddItem("Save Preset", NULL, MENUITEMTYPE_BUNK, "Save current settings to a new preset file", 0, 0, SavePreset_Callback);
-    m_menuPreset.AddItem("---", NULL, MENUITEMTYPE_BUNK, "", 0, 0, NULL);
-    m_menuPreset.AddItem("Next Preset", NULL, MENUITEMTYPE_BUNK, "Switch to the next preset", 0, 0, NextPreset_Callback);
-    m_menuPreset.AddItem("Previous Preset", NULL, MENUITEMTYPE_BUNK, "Switch to the previous preset", 0, 0, PrevPreset_Callback);
-    m_menuPreset.AddItem("Random Preset", NULL, MENUITEMTYPE_BUNK, "Switch to a random preset", 0, 0, RandomPreset_Callback);
-    m_menuPreset.AddItem("---", NULL, MENUITEMTYPE_BUNK, "", 0, 0, NULL);
+    m_menuPreset.AddItem("Load Preset", NULL, MENUITEMTYPE_BUNK, "Load a preset from disk", 0, 0, 0.0f, LoadPreset_Callback);
+    m_menuPreset.AddItem("Save Preset", NULL, MENUITEMTYPE_BUNK, "Save current settings to a new preset file", 0, 0, 0.0f, SavePreset_Callback);
+    m_menuPreset.AddItem("---", NULL, MENUITEMTYPE_BUNK, "", 0, 0, 0.0f, NULL);
+    m_menuPreset.AddItem("Next Preset", NULL, MENUITEMTYPE_BUNK, "Switch to the next preset", 0, 0, 0.0f, NextPreset_Callback);
+    m_menuPreset.AddItem("Previous Preset", NULL, MENUITEMTYPE_BUNK, "Switch to the previous preset", 0, 0, 0.0f, PrevPreset_Callback);
+    m_menuPreset.AddItem("Random Preset", NULL, MENUITEMTYPE_BUNK, "Switch to a random preset", 0, 0, 0.0f, RandomPreset_Callback);
+    m_menuPreset.AddItem("---", NULL, MENUITEMTYPE_BUNK, "", 0, 0, 0.0f, NULL);
 
     // Sub-menus
     m_menuWave.Init("Wave");
@@ -826,11 +830,11 @@ void CPlugin::BuildMenus()
     m_menuPreset.AddChildMenu(&m_menuMotion);
     m_menuPreset.AddChildMenu(&m_menuPost);
 
-    m_menuPreset.AddItem("---", NULL, MENUITEMTYPE_BUNK, "", 0, 0, NULL);
-    m_menuPreset.AddItem("Lock/Unlock Preset", NULL, MENUITEMTYPE_BUNK, "Toggle preset lock", 0, 0, LockPreset_Callback);
-    m_menuPreset.AddItem("Toggle Help", NULL, MENUITEMTYPE_BUNK, "Toggle help text", 0, 0, ToggleHelp_Callback);
-    m_menuPreset.AddItem("Toggle Info", NULL, MENUITEMTYPE_BUNK, "Toggle preset and FPS info", 0, 0, ToggleInfo_Callback);
-    m_menuPreset.AddItem("Toggle Fullscreen", NULL, MENUITEMTYPE_BUNK, "Toggle fullscreen mode", 0, 0, ToggleFullscreen_Callback);
+    m_menuPreset.AddItem("---", NULL, MENUITEMTYPE_BUNK, "", 0, 0, 0.0f, NULL);
+    m_menuPreset.AddItem("Lock/Unlock Preset", NULL, MENUITEMTYPE_BUNK, "Toggle preset lock", 0, 0, 0.0f, LockPreset_Callback);
+    m_menuPreset.AddItem("Toggle Help", NULL, MENUITEMTYPE_BUNK, "Toggle help text", 0, 0, 0.0f, ToggleHelp_Callback);
+    m_menuPreset.AddItem("Toggle Info", NULL, MENUITEMTYPE_BUNK, "Toggle preset and FPS info", 0, 0, 0.0f, ToggleInfo_Callback);
+    m_menuPreset.AddItem("Toggle Fullscreen", NULL, MENUITEMTYPE_BUNK, "Toggle fullscreen mode", 0, 0, 0.0f, ToggleFullscreen_Callback);
 
     // Set the current menu to the main menu
     m_pCurMenu = &m_menuPreset;
@@ -850,8 +854,26 @@ void CPlugin::AddError(const char* szMsg, float fDuration, int category, bool bB
 void CPlugin::ClearErrors(int category) { }
 void CPlugin::SetCurrentPresetRating(float fNewRating) { }
 
-void CPlugin::PrevPreset(float fBlendTime) { LoadRandomPreset(fBlendTime); }
-void CPlugin::NextPreset(float fBlendTime) { LoadRandomPreset(fBlendTime); }
+void CPlugin::PrevPreset(float fBlendTime)
+{
+    if (m_nPresets - m_nDirs == 0) return;
+    m_nCurrentPreset--;
+    if (m_nCurrentPreset < m_nDirs)
+        m_nCurrentPreset = m_nPresets - 1;
+    char szFile[1024];
+    snprintf(szFile, sizeof(szFile), "%s%s", m_szPresetDir, m_presets[m_nCurrentPreset].szFilename.c_str());
+    LoadPreset(szFile, fBlendTime);
+}
+void CPlugin::NextPreset(float fBlendTime)
+{
+    if (m_nPresets - m_nDirs == 0) return;
+    m_nCurrentPreset++;
+    if (m_nCurrentPreset >= m_nPresets)
+        m_nCurrentPreset = m_nDirs;
+    char szFile[1024];
+    snprintf(szFile, sizeof(szFile), "%s%s", m_szPresetDir, m_presets[m_nCurrentPreset].szFilename.c_str());
+    LoadPreset(szFile, fBlendTime);
+}
 void CPlugin::LoadPresetTick() {}
 void CPlugin::OnFinishedLoadingPreset() {}
 void CPlugin::RandomizeBlendPattern() {}
@@ -980,7 +1002,7 @@ void CPlugin::ToggleFullscreen()
     }
 }
 
-void CPlugin::LoadPreset_Callback(LPARAM param1, LPARAM param2) { g_plugin->m_UI_mode = UI_LOAD; g_plugin->m_bShowMenu = false; }
+void CPlugin::LoadPreset_Callback(LPARAM param1, LPARAM param2) { g_plugin->LoadPreset("plugins/MilkDrop2/presets/flexi - bouncing balls [mindblob terraforming] flx roams domikleasing undergraeduhate.milk", g_plugin->m_fBlendTimeUser); }
 void CPlugin::SavePreset_Callback(LPARAM param1, LPARAM param2) { g_plugin->m_UI_mode = UI_SAVEAS; g_plugin->m_bShowMenu = false; }
 void CPlugin::NextPreset_Callback(LPARAM param1, LPARAM param2) { g_plugin->NextPreset(g_plugin->m_fBlendTimeUser); }
 void CPlugin::PrevPreset_Callback(LPARAM param1, LPARAM param2) { g_plugin->PrevPreset(g_plugin->m_fBlendTimeUser); }

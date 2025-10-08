@@ -4,8 +4,16 @@ This file outlines the remaining tasks to complete the Linux port of MilkDrop3.
 
 ## High Priority
 
+- **Implement a proper preset file browser:** Currently, presets are loaded via hardcoded paths. A user-friendly interface to browse and select preset files is needed.
+- **Fix black screen after preset load:** Investigate why presets are not rendering after being loaded, even though no errors are reported.
+
 ## Completed
 
+- **Include presets folder in build:** The `plugins/MilkDrop2/presets` directory is now copied to the build directory during the CMake process.
+- **Fix linker errors:** Resolved multiple definition and undefined reference linker errors.
+- **Fix menu item logic:** Corrected the logic for "Next Preset" and "Previous Preset" menu items.
+- **Fix horizontally reversed text:** Corrected the texture coordinates in `TextRenderer::RenderText`.
+- **Ensure UI elements are rendered:** Added a call to `CPlugin::MyRenderUI` in the main application loop.
 - **Address Compiler Warnings:** The build still produces a number of warnings related to `const`-correctness and other issues in the `ns-eel2` library. These should be cleaned up.
 
 - **Implement Full Menu Rendering:**

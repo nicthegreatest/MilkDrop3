@@ -6,6 +6,9 @@
 #include <thread>
 #include <locale.h>
 #include "portaudio.h"
+#include <unistd.h>
+#include <libgen.h>
+#include <linux/limits.h>
 
 #include "wasabi.h"
 #include "../audio/common.h"
@@ -47,6 +50,16 @@ void RenderFrame() {
 
 int main(void)
 {
+    char exe_path[PATH_MAX];
+    ssize_t len = readlink("/proc/self/exe", exe_path, sizeof(exe_path) - 1);
+    if (len != -1) {
+        exe_path[len] = '\0';
+        char* exe_dir = dirname(exe_path);
+        if (chdir(exe_dir) != 0) {
+            perror("chdir failed");
+        }
+    }
+
     printf("main: starting\n");
     GLFWwindow* window;
 
@@ -95,6 +108,7 @@ int main(void)
     while (!glfwWindowShouldClose(window))
     {
         RenderFrame();
+        g_plugin->MyRenderUI(NULL, NULL, NULL, NULL, 0, 0);
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
@@ -106,3 +120,4 @@ int main(void)
     glfwTerminate();
     exit(EXIT_SUCCESS);
 }
+

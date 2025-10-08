@@ -20,7 +20,7 @@ For a list of the remaining tasks required to get the project running, see [TODO
 
 This project is currently undergoing a significant refactoring effort to port the original Windows/DirectX codebase to a modern, cross-platform C++ application that can be compiled and run on Linux using OpenGL.
 
-The core rendering pipeline has now been implemented using OpenGL. This includes the rendering of the audio-reactive waveform, custom shapes, and sprites. The menu system is now fully functional with text rendering, and the shader-based rendering effects for presets have been implemented.
+The menu system is now visible and functional, with correct text rendering and navigation. The "Next Preset" and "Previous Preset" menu items now correctly cycle through presets. Presets can be loaded, and the application attempts to render them, although a black screen is currently displayed after loading a preset, with no errors in the console. The `plugins/MilkDrop2/presets` directory is now included in the build process.
 
 
 ## Building and Running
