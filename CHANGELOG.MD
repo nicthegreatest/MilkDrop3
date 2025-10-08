@@ -18,6 +18,7 @@ By following these instructions, you will help us maintain a clean, accurate, an
 ## [Unreleased]
 
 ### Fixed
+- Resolved all compiler warnings, including `const`-correctness issues and potential buffer overflows.
 - Fixed several build errors to get the project to compile successfully.
 
 ### Documentation

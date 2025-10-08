@@ -486,10 +486,10 @@ public:
         CMilkMenu    m_menuShapecode[MAX_CUSTOM_SHAPES];
         bool         m_bShowShaderHelp;
 
-        char		m_szMilkdrop2Path[MAX_PATH];		// ends in a backslash
-        char		m_szMsgIniFile[MAX_PATH];
-        char     m_szImgIniFile[MAX_PATH];
-        char		m_szPresetDir[MAX_PATH];
+        char		m_szMilkdrop2Path[1024];		// ends in a backslash
+        char		m_szMsgIniFile[1024];
+        char     m_szImgIniFile[1024];
+        char		m_szPresetDir[1024];
         float		m_fRandStart[4];
 
         // Shader pipeline resources
