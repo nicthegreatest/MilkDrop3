@@ -2,6 +2,8 @@
 #include "resource.h"
 #include <string>
 #include <map>
+#include <stdio.h>
+#include <string.h>
 
 static std::map<int, std::string> g_lang_string_table;
 static bool g_lang_table_initialized = false;
@@ -65,172 +67,11 @@ void InitLangStringTable()
     g_lang_string_table[IDS_WARNING_THE_FOLLOWING_SPRITE_TEXTURE_WAS_NOT_FOUND] = "Warning: the following sprite texture was not found: ";
     g_lang_string_table[IDS_YOU_HAVE_RATED_THIS_PRESET_X_5] = "You have rated this preset %d/5.";
     g_lang_string_table[IDS_INVALID_PRESET_FILE] = "Invalid preset file.";
-    g_lang_string_table[IDS_PRESET_NOT_FOUND] = "Preset not found.";
-    g_lang_string_table[IDS_PRESET_FILE_EMPTY] = "Preset file empty.";
-    g_lang_string_table[IDS_NO_PRESETS_IN_DIR] = "No presets in directory.";
-    g_lang_string_table[IDS_NO_HELP_AVAILABLE] = "No help available.";
-    g_lang_string_table[IDS_NO_SONG_TITLE] = "No song title.";
-    g_lang_string_table[IDS_UNKNOWN_ERROR] = "Unknown error.";
-    g_lang_string_table[IDS_WARNING_UNKNOWN_VARIABLE_IN_PRESET_X] = "Warning: unknown variable '%s' in preset.";
-    g_lang_string_table[IDS_WARNING_UNKNOWN_FUNCTION_IN_PRESET_X] = "Warning: unknown function '%s' in preset.";
-    g_lang_string_table[IDS_WARNING_INVALID_PARAMETERS_IN_PRESET_X] = "Warning: invalid parameters for function '%s' in preset.";
-    g_lang_string_table[IDS_WARNING_SYNTAX_ERROR_IN_PRESET_X] = "Warning: syntax error in preset '%s'.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_NO_CODE] = "Warning: preset '%s' has no code.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_IS_MISSING_A_SECTION] = "Warning: preset '%s' is missing a section.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_IS_NOT_A_VALID_PRESET_FILE] = "Warning: preset '%s' is not a valid preset file.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_IS_CORRUPT] = "Warning: preset '%s' is corrupt.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_IS_TOO_LARGE] = "Warning: preset '%s' is too large.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_VERSION] = "Warning: preset '%s' has an invalid version.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_VERSION] = "Warning: preset '%s' has an unsupported version.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_PS_VERSION] = "Warning: preset '%s' has an invalid pixel shader version.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_PS_VERSION] = "Warning: preset '%s' has an unsupported pixel shader version.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_WAVE_TYPE] = "Warning: preset '%s' has an invalid wave type.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_WAVE_TYPE] = "Warning: preset '%s' has an unsupported wave type.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_SHAPE_TYPE] = "Warning: preset '%s' has an invalid shape type.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_SHAPE_TYPE] = "Warning: preset '%s' has an unsupported shape type.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_BLEND_MODE] = "Warning: preset '%s' has an invalid blend mode.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_BLEND_MODE] = "Warning: preset '%s' has an unsupported blend mode.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_COLOR_MAP] = "Warning: preset '%s' has an invalid color map.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_COLOR_MAP] = "Warning: preset '%s' has an unsupported color map.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_TEXTURE_SIZE] = "Warning: preset '%s' has an invalid texture size.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_TEXTURE_SIZE] = "Warning: preset '%s' has an unsupported texture size.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_GRID_SIZE] = "Warning: preset '%s' has an invalid grid size.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_GRID_SIZE] = "Warning: preset '%s' has an unsupported grid size.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_MOTION_VECTOR_COUNT] = "Warning: preset '%s' has an invalid motion vector count.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_MOTION_VECTOR_COUNT] = "Warning: preset '%s' has an unsupported motion vector count.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_SPRITE_COUNT] = "Warning: preset '%s' has an invalid sprite count.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_SPRITE_COUNT] = "Warning: preset '%s' has an unsupported sprite count.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_CUSTOM_WAVE_COUNT] = "Warning: preset '%s' has an invalid custom wave count.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_CUSTOM_WAVE_COUNT] = "Warning: preset '%s' has an unsupported custom wave count.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_CUSTOM_SHAPE_COUNT] = "Warning: preset '%s' has an invalid custom shape count.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_CUSTOM_SHAPE_COUNT] = "Warning: preset '%s' has an unsupported custom shape count.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_CUSTOM_MESSAGE_COUNT] = "Warning: preset '%s' has an invalid custom message count.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_CUSTOM_MESSAGE_COUNT] = "Warning: preset '%s' has an unsupported custom message count.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_CUSTOM_MESSAGE_FONT_COUNT] = "Warning: preset '%s' has an invalid custom message font count.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_CUSTOM_MESSAGE_FONT_COUNT] = "Warning: preset '%s' has an unsupported custom message font count.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_CUSTOM_MESSAGE_FONT] = "Warning: preset '%s' has an invalid custom message font.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_CUSTOM_MESSAGE_FONT] = "Warning: preset '%s' has an unsupported custom message font.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_CUSTOM_MESSAGE] = "Warning: preset '%s' has an invalid custom message.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_CUSTOM_MESSAGE] = "Warning: preset '%s' has an unsupported custom message.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_SPRITE] = "Warning: preset '%s' has an invalid sprite.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_SPRITE] = "Warning: preset '%s' has an unsupported sprite.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_CUSTOM_WAVE] = "Warning: preset '%s' has an invalid custom wave.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_CUSTOM_WAVE] = "Warning: preset '%s' has an unsupported custom wave.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_CUSTOM_SHAPE] = "Warning: preset '%s' has an invalid custom shape.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_CUSTOM_SHAPE] = "Warning: preset '%s' has an unsupported custom shape.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_BORDER] = "Warning: preset '%s' has an invalid border.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_BORDER] = "Warning: preset '%s' has an unsupported border.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_MOTION_VECTORS] = "Warning: preset '%s' has an invalid motion vectors.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_MOTION_VECTORS] = "Warning: preset '%s' has an unsupported motion vectors.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_VIDEO_ECHO] = "Warning: preset '%s' has an invalid video echo.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_VIDEO_ECHO] = "Warning: preset '%s' has an unsupported video echo.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_STEREO_3D_MODE] = "Warning: preset '%s' has an invalid stereo 3d mode.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_STEREO_3D_MODE] = "Warning: preset '%s' has an unsupported stereo 3d mode.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_TEXTURE_WRAP_MODE] = "Warning: preset '%s' has an invalid texture wrap mode.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_TEXTURE_WRAP_MODE] = "Warning: preset '%s' has an unsupported texture wrap mode.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_FILTER_MODE] = "Warning: preset '%s' has an invalid filter mode.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_FILTER_MODE] = "Warning: preset '%s' has an unsupported filter mode.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_GAMMA_VALUE] = "Warning: preset '%s' has an invalid gamma value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_GAMMA_VALUE] = "Warning: preset '%s' has an unsupported gamma value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_DECAY_VALUE] = "Warning: preset '%s' has an invalid decay value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_DECAY_VALUE] = "Warning: preset '%s' has an unsupported decay value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_WAVE_ALPHA_VALUE] = "Warning: preset '%s' has an invalid wave alpha value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_WAVE_ALPHA_VALUE] = "Warning: preset '%s' has an unsupported wave alpha value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_WAVE_SCALE_VALUE] = "Warning: preset '%s' has an invalid wave scale value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_WAVE_SCALE_VALUE] = "Warning: preset '%s' has an unsupported wave scale value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_WAVE_SMOOTHING_VALUE] = "Warning: preset '%s' has an invalid wave smoothing value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_WAVE_SMOOTHING_VALUE] = "Warning: preset '%s' has an unsupported wave smoothing value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_WAVE_PARAM_VALUE] = "Warning: preset '%s' has an invalid wave param value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_WAVE_PARAM_VALUE] = "Warning: preset '%s' has an unsupported wave param value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_MOD_WAVE_ALPHA_START_VALUE] = "Warning: preset '%s' has an invalid mod wave alpha start value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_MOD_WAVE_ALPHA_START_VALUE] = "Warning: preset '%s' has an unsupported mod wave alpha start value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_MOD_WAVE_ALPHA_END_VALUE] = "Warning: preset '%s' has an invalid mod wave alpha end value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_MOD_WAVE_ALPHA_END_VALUE] = "Warning: preset '%s' has an unsupported mod wave alpha end value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_WARP_ANIM_SPEED_VALUE] = "Warning: preset '%s' has an invalid warp anim speed value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_WARP_ANIM_SPEED_VALUE] = "Warning: preset '%s' has an unsupported warp anim speed value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_WARP_SCALE_VALUE] = "Warning: preset '%s' has an invalid warp scale value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_WARP_SCALE_VALUE] = "Warning: preset '%s' has an unsupported warp scale value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_ZOOM_EXPONENT_VALUE] = "Warning: preset '%s' has an invalid zoom exponent value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_ZOOM_EXPONENT_VALUE] = "Warning: preset '%s' has an unsupported zoom exponent value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_SHADER_VALUE] = "Warning: preset '%s' has an invalid shader value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_SHADER_VALUE] = "Warning: preset '%s' has an unsupported shader value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_ZOOM_VALUE] = "Warning: preset '%s' has an invalid zoom value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_ZOOM_VALUE] = "Warning: preset '%s' has an unsupported zoom value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_ROT_VALUE] = "Warning: preset '%s' has an invalid rot value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_ROT_VALUE] = "Warning: preset '%s' has an unsupported rot value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_CX_VALUE] = "Warning: preset '%s' has an invalid cx value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_CX_VALUE] = "Warning: preset '%s' has an unsupported cx value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_CY_VALUE] = "Warning: preset '%s' has an invalid cy value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_CY_VALUE] = "Warning: preset '%s' has an unsupported cy value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_DX_VALUE] = "Warning: preset '%s' has an invalid dx value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_DX_VALUE] = "Warning: preset '%s' has an unsupported dx value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_DY_VALUE] = "Warning: preset '%s' has an invalid dy value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_DY_VALUE] = "Warning: preset '%s' has an unsupported dy value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_WARP_VALUE] = "Warning: preset '%s' has an invalid warp value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_WARP_VALUE] = "Warning: preset '%s' has an unsupported warp value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_SX_VALUE] = "Warning: preset '%s' has an invalid sx value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_SX_VALUE] = "Warning: preset '%s' has an unsupported sx value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_SY_VALUE] = "Warning: preset '%s' has an invalid sy value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_SY_VALUE] = "Warning: preset '%s' has an unsupported sy value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_WAVE_R_VALUE] = "Warning: preset '%s' has an invalid wave_r value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_WAVE_R_VALUE] = "Warning: preset '%s' has an unsupported wave_r value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_WAVE_G_VALUE] = "Warning: preset '%s' has an invalid wave_g value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_WAVE_G_VALUE] = "Warning: preset '%s' has an unsupported wave_g value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_WAVE_B_VALUE] = "Warning: preset '%s' has an invalid wave_b value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_WAVE_B_VALUE] = "Warning: preset '%s' has an unsupported wave_b value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_WAVE_X_VALUE] = "Warning: preset '%s' has an invalid wave_x value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_WAVE_X_VALUE] = "Warning: preset '%s' has an unsupported wave_x value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_WAVE_Y_VALUE] = "Warning: preset '%s' has an invalid wave_y value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_WAVE_Y_VALUE] = "Warning: preset '%s' has an unsupported wave_y value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_OB_SIZE_VALUE] = "Warning: preset '%s' has an invalid ob_size value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_OB_SIZE_VALUE] = "Warning: preset '%s' has an unsupported ob_size value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_OB_R_VALUE] = "Warning: preset '%s' has an invalid ob_r value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_OB_R_VALUE] = "Warning: preset '%s' has an unsupported ob_r value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_OB_G_VALUE] = "Warning: preset '%s' has an invalid ob_g value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_OB_G_VALUE] = "Warning: preset '%s' has an unsupported ob_g value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_OB_B_VALUE] = "Warning: preset '%s' has an invalid ob_b value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_OB_B_VALUE] = "Warning: preset '%s' has an unsupported ob_b value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_OB_A_VALUE] = "Warning: preset '%s' has an invalid ob_a value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_OB_A_VALUE] = "Warning: preset '%s' has an unsupported ob_a value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_IB_SIZE_VALUE] = "Warning: preset '%s' has an invalid ib_size value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_IB_SIZE_VALUE] = "Warning: preset '%s' has an unsupported ib_size value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_IB_R_VALUE] = "Warning: preset '%s' has an invalid ib_r value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_IB_R_VALUE] = "Warning: preset '%s' has an unsupported ib_r value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_IB_G_VALUE] = "Warning: preset '%s' has an invalid ib_g value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_IB_G_VALUE] = "Warning: preset '%s' has an unsupported ib_g value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_IB_B_VALUE] = "Warning: preset '%s' has an invalid ib_b value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_IB_B_VALUE] = "Warning: preset '%s' has an unsupported ib_b value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_IB_A_VALUE] = "Warning: preset '%s' has an invalid ib_a value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_IB_A_VALUE] = "Warning: preset '%s' has an unsupported ib_a value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_MV_X_VALUE] = "Warning: preset '%s' has an invalid mv_x value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_MV_X_VALUE] = "Warning: preset '%s' has an unsupported mv_x value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_MV_Y_VALUE] = "Warning: preset '%s' has an invalid mv_y value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_MV_Y_VALUE] = "Warning: preset '%s' has an unsupported mv_y value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_MV_DX_VALUE] = "Warning: preset '%s' has an invalid mv_dx value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_MV_DX_VALUE] = "Warning: preset '%s' has an unsupported mv_dx value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_MV_DY_VALUE] = "Warning: preset '%s' has an invalid mv_dy value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_MV_DY_VALUE] = "Warning: preset '%s' has an unsupported mv_dy value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_MV_L_VALUE] = "Warning: preset '%s' has an invalid mv_l value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_MV_L_VALUE] = "Warning: preset '%s' has an unsupported mv_l value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_MV_R_VALUE] = "Warning: preset '%s' has an invalid mv_r value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_MV_R_VALUE] = "Warning: preset '%s' has an unsupported mv_r value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_MV_G_VALUE] = "Warning: preset '%s' has an invalid mv_g value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_MV_G_VALUE] = "Warning: preset '%s' has an unsupported mv_g value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_MV_B_VALUE] = "Warning: preset '%s' has an invalid mv_b value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_MV_B_VALUE] = "Warning: preset '%s' has an unsupported mv_b value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_INVALID_MV_A_VALUE] = "Warning: preset '%s' has an invalid mv_a value.";
-    g_lang_string_table[IDS_WARNING_PRESET_X_HAS_AN_UNSUPPORTED_MV_A_VALUE] = "Warning: preset '%s' has an unsupported mv_a value.";
-    g_lang_string_table[IDS_RATING_5_STARS] = "5 stars";
-    g_lang_string_table[IDS_RATING_4_STARS] = "4 stars";
-    g_lang_string_table[IDS_RATING_3_STARS] = "3 stars";
-    g_lang_string_table[IDS_RATING_2_STARS] = "2 stars";
-    g_lang_string_table[IDS_RATING_1_STAR] = "1 star";
-    g_lang_string_table[IDS_RATING_NOT_RATED] = "Not rated";
 
     g_lang_table_initialized = true;
 }
 
-const char* wasabiApiLangString(int resource_id)
+const char* wasabiApiLangString(int resource_id, char* buf, int buf_len)
 {
     if (!g_lang_table_initialized)
     {
@@ -239,16 +80,11 @@ const char* wasabiApiLangString(int resource_id)
 
     if (g_lang_string_table.count(resource_id))
     {
-        return g_lang_string_table[resource_id].c_str();
+        strncpy(buf, g_lang_string_table[resource_id].c_str(), buf_len - 1);
+        buf[buf_len - 1] = '\0';
+        return buf;
     }
 
-    static char buf[256];
-    sprintf(buf, "LangString %d", resource_id);
+    snprintf(buf, buf_len, "LangString %d", resource_id);
     return buf;
-}
-
-std::string& GetString(int resource_id, std::string& str)
-{
-    str = wasabiApiLangString(resource_id);
-    return str;
 }
