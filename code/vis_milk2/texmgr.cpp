@@ -232,7 +232,7 @@ bool texmgr::RecompileExpressions(int iSlot)
 	StripLinefeedCharsAndComments(expr, buf);
 
     if (m_tex[iSlot].m_codehandle) NSEEL_code_free(m_tex[iSlot].m_codehandle);
-    m_tex[iSlot].m_codehandle = NSEEL_code_compile(m_tex[iSlot].tex_eel_ctx, (unsigned char*)buf);
+    m_tex[iSlot].m_codehandle = NSEEL_code_compile(m_tex[iSlot].tex_eel_ctx, (const char*)buf, 0);
 
 	return (m_tex[iSlot].m_codehandle != NULL);
 }

@@ -140,6 +140,7 @@ target_include_directories(milkdrop3 PUBLIC
     "${PROJECT_SOURCE_DIR}/ns-eel2"
     "${PROJECT_SOURCE_DIR}/vis_milk2"
     "${PROJECT_SOURCE_DIR}/ns-eel2/numericSys/HPFloat"
+    "${PROJECT_SOURCE_DIR}/third_party/stb"
     ${PORTAUDIO_INCLUDE_DIRS}
 )
 

@@ -493,6 +493,7 @@ public:
         float		m_fRandStart[4];
 
         // Shader pipeline resources
+        #define NUM_BLUR_TEX 6
         GLuint m_render_target_fbo[2];
         GLuint m_render_target_tex[2];
         GLuint m_blur_fbo[NUM_BLUR_TEX];
@@ -501,7 +502,6 @@ public:
         GLuint m_fs_quad_vbo;
 
         // DIRECTX 9 (placeholders)
-        #define NUM_BLUR_TEX 6
         #if (NUM_BLUR_TEX>0)
         int               m_nBlurTexW[NUM_BLUR_TEX];
         int               m_nBlurTexH[NUM_BLUR_TEX];

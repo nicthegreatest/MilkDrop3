@@ -343,9 +343,9 @@ void CPlugin::RenderFrame(int bRedraw)
 
     if (bRedraw)
     {
-	    IDirect3DTexture9* pTemp = m_lpVS[0];
-	    m_lpVS[0] = m_lpVS[1];
-	    m_lpVS[1] = pTemp;
+	    GLuint pTemp = m_render_target_tex[0];
+	    m_render_target_tex[0] = m_render_target_tex[1];
+	    m_render_target_tex[1] = pTemp;
     }
 
 	if (GetFrame()==0)
@@ -494,9 +494,9 @@ void CPlugin::RenderFrame(int bRedraw)
 
 	DrawUserSprites();
 
-	IDirect3DTexture9* pTemp = m_lpVS[0];
-	m_lpVS[0] = m_lpVS[1];
-	m_lpVS[1] = pTemp;
+	GLuint pTemp = m_render_target_tex[0];
+	m_render_target_tex[0] = m_render_target_tex[1];
+	m_render_target_tex[1] = pTemp;
 }
 
 void CPlugin::DrawMotionVectors()
@@ -883,9 +883,5 @@ void CPlugin::DrawUserSprites()
 }
 
 void CPlugin::RestoreShaderParams()
-{
-}
-
-void CPlugin::ApplyShaderParams(CShaderParams* p, LPD3DXCONSTANTTABLE pCT, CState* pState)
 {
 }
