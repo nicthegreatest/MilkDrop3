@@ -1,15 +1,10 @@
-#pragma once
+#ifndef __WASABI_H__
+#define __WASABI_H__
 
-// Forward declarations for cross-platform compatibility
-struct HMENU__;
-typedef HMENU__* HMENU;
-struct HWND__;
-typedef HWND__* HWND;
-typedef int (*DLGPROC)(HWND, unsigned int, unsigned int, long);
+#include <string>
 
-// Stub functions for cross-platform build.
-// These will need to be implemented with a cross-platform UI/localization library.
-const char* wasabiApiLangString(int id, char* buffer, int len);
-const char* wasabiApiLangString(int id);
-HMENU wasabiApiLoadMenu(int id);
-HWND wasabiApiCreateDialogParam(int templateName, HWND parent, DLGPROC proc, long initParam);
+// Function to retrieve a localized string from the language pack
+const char* wasabiApiLangString(int resource_id);
+std::string& GetString(int resource_id, std::string& str);
+
+#endif // __WASABI_H__
