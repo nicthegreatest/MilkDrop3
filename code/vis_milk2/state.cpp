@@ -1609,6 +1609,7 @@ void CState::RecompileExpressions(int flags, int bReInit)
 	//g_plugin->m_fShowUserMessageUntilThisTime = g_plugin->GetTime();
 
 	    char buf[MAX_BIGSTRING_LEN*3];
+        char error_string_fmt[1024];
 
         if (flags & RECOMPILE_PRESET_CODE)
         {
@@ -1620,9 +1621,10 @@ void CState::RecompileExpressions(int flags, int bReInit)
 
 			    if ( ! (pf_codehandle_init = NSEEL_code_compile(m_pf_eel, buf, 0)))
 			    {
-                    char buf[1024];
-				    sprintf(buf, wasabiApiLangString(IDS_WARNING_PRESET_X_ERROR_IN_PRESET_INIT_CODE), m_szDesc);
-                    g_plugin->AddError(buf, 6.0f, ERR_PRESET, true);
+                    char error_buf[1024];
+                    char format_buf[1024];
+				    sprintf(error_buf, wasabiApiLangString(format_buf, sizeof(format_buf), IDS_WARNING_PRESET_X_ERROR_IN_PRESET_INIT_CODE), m_szDesc);
+                    g_plugin->AddError(error_buf, 6.0f, ERR_PRESET, true);
 
                     for (int vi=0; vi<NUM_Q_VAR; vi++)
 				        q_values_after_init_code[vi] = 0;
@@ -1651,9 +1653,10 @@ void CState::RecompileExpressions(int flags, int bReInit)
 	        {
 			    if ( ! (m_pf_codehandle = NSEEL_code_compile(m_pf_eel, buf, 0)))
 			    {
-                    char buf[1024];
-				    sprintf(buf, wasabiApiLangString(IDS_WARNING_PRESET_X_ERROR_IN_PER_FRAME_CODE), m_szDesc);
-                    g_plugin->AddError(buf, 6.0f, ERR_PRESET, true);
+                    char error_buf[1024];
+                    char format_buf[1024];
+				    sprintf(error_buf, wasabiApiLangString(format_buf, sizeof(format_buf), IDS_WARNING_PRESET_X_ERROR_IN_PER_FRAME_CODE), m_szDesc);
+                    g_plugin->AddError(error_buf, 6.0f, ERR_PRESET, true);
 			    }
 	        }
 
@@ -1663,9 +1666,10 @@ void CState::RecompileExpressions(int flags, int bReInit)
 	        {
 			    if ( ! (m_pp_codehandle = NSEEL_code_compile(m_pv_eel, buf, 0)))
 			    {
-                    char buf[1024];
-				    sprintf(buf, wasabiApiLangString(IDS_WARNING_PRESET_X_ERROR_IN_PER_VERTEX_CODE), m_szDesc);
-                    g_plugin->AddError(buf, 6.0f, ERR_PRESET, true);
+                    char error_buf[1024];
+                    char format_buf[1024];
+				    sprintf(error_buf, wasabiApiLangString(format_buf, sizeof(format_buf), IDS_WARNING_PRESET_X_ERROR_IN_PER_VERTEX_CODE), m_szDesc);
+                    g_plugin->AddError(error_buf, 6.0f, ERR_PRESET, true);
 			    }
 	        }
 
@@ -1685,9 +1689,10 @@ void CState::RecompileExpressions(int flags, int bReInit)
 		                NSEEL_CODEHANDLE	codehandle_temp;
 			            if ( ! (codehandle_temp = NSEEL_code_compile(m_wave[i].m_pf_eel, buf, 0)))
 			            {
-                            char buf[1024];
-				            sprintf(buf, wasabiApiLangString(IDS_WARNING_PRESET_X_ERROR_IN_WAVE_X_INIT_CODE), m_szDesc, i);
-                            g_plugin->AddError(buf, 6.0f, ERR_PRESET, true);
+                            char error_buf[1024];
+                            char format_buf[1024];
+				            sprintf(error_buf, wasabiApiLangString(format_buf, sizeof(format_buf), IDS_WARNING_PRESET_X_ERROR_IN_WAVE_X_INIT_CODE), m_szDesc, i);
+                            g_plugin->AddError(error_buf, 6.0f, ERR_PRESET, true);
 
                             for (int vi=0; vi<NUM_Q_VAR; vi++)
                                 *m_wave[i].var_pf_q[vi] = q_values_after_init_code[vi];
@@ -1722,9 +1727,10 @@ void CState::RecompileExpressions(int flags, int bReInit)
 		            #ifndef _NO_EXPR_
 			            if ( ! (m_wave[i].m_pf_codehandle = NSEEL_code_compile(m_wave[i].m_pf_eel, buf, 0)))
 			            {
-                            char buf[1024];
-				            sprintf(buf, wasabiApiLangString(IDS_WARNING_PRESET_X_ERROR_IN_WAVE_X_PER_FRAME_CODE), m_szDesc, i);
-                            g_plugin->AddError(buf, 6.0f, ERR_PRESET, true);
+                            char error_buf[1024];
+                            char format_buf[1024];
+				            sprintf(error_buf, wasabiApiLangString(format_buf, sizeof(format_buf), IDS_WARNING_PRESET_X_ERROR_IN_WAVE_X_PER_FRAME_CODE), m_szDesc, i);
+                            g_plugin->AddError(error_buf, 6.0f, ERR_PRESET, true);
 			            }
                     #endif
                 }
@@ -1735,9 +1741,10 @@ void CState::RecompileExpressions(int flags, int bReInit)
                 {
 			        if ( ! (m_wave[i].m_pp_codehandle = NSEEL_code_compile(m_wave[i].m_pp_eel, buf, 0)))
 			        {
-                        char buf[1024];
-				        sprintf(buf, wasabiApiLangString(IDS_WARNING_PRESET_X_ERROR_IN_WAVE_X_PER_POINT_CODE), m_szDesc, i);
-                        g_plugin->AddError(buf, 6.0f, ERR_PRESET, true);
+                        char error_buf[1024];
+                        char format_buf[1024];
+				        sprintf(error_buf, wasabiApiLangString(format_buf, sizeof(format_buf), IDS_WARNING_PRESET_X_ERROR_IN_WAVE_X_PER_POINT_CODE), m_szDesc, i);
+                        g_plugin->AddError(error_buf, 6.0f, ERR_PRESET, true);
 			        }
                 }
             }
@@ -1756,9 +1763,10 @@ void CState::RecompileExpressions(int flags, int bReInit)
 		                NSEEL_CODEHANDLE	codehandle_temp;
 			            if ( ! (codehandle_temp = NSEEL_code_compile(m_shape[i].m_pf_eel, buf, 0)))
 			            {
-                            char buf[1024];
-				            sprintf(buf, wasabiApiLangString(IDS_WARNING_PRESET_X_ERROR_IN_SHAPE_X_INIT_CODE), m_szDesc, i);
-                            g_plugin->AddError(buf, 6.0f, ERR_PRESET, true);
+                            char error_buf[1024];
+                            char format_buf[1024];
+				            sprintf(error_buf, wasabiApiLangString(format_buf, sizeof(format_buf), IDS_WARNING_PRESET_X_ERROR_IN_SHAPE_X_INIT_CODE), m_szDesc, i);
+                            g_plugin->AddError(error_buf, 6.0f, ERR_PRESET, true);
 
                             for (int vi=0; vi<NUM_Q_VAR; vi++)
                                 *m_shape[i].var_pf_q[vi] = q_values_after_init_code[vi];
@@ -1793,9 +1801,10 @@ void CState::RecompileExpressions(int flags, int bReInit)
 		            #ifndef _NO_EXPR_
 			            if ( ! (m_shape[i].m_pf_codehandle = NSEEL_code_compile(m_shape[i].m_pf_eel, buf, 0)))
 			            {
-                            char buf[1024];
-				            sprintf(buf, wasabiApiLangString(IDS_WARNING_PRESET_X_ERROR_IN_SHAPE_X_PER_FRAME_CODE), m_szDesc, i);
-                            g_plugin->AddError(buf, 6.0f, ERR_PRESET, true);
+                            char error_buf[1024];
+                            char format_buf[1024];
+				            sprintf(error_buf, wasabiApiLangString(format_buf, sizeof(format_buf), IDS_WARNING_PRESET_X_ERROR_IN_SHAPE_X_PER_FRAME_CODE), m_szDesc, i);
+                            g_plugin->AddError(error_buf, 6.0f, ERR_PRESET, true);
 			            }
 		            #endif
                 }
