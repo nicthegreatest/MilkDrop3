@@ -196,6 +196,10 @@ public:
 	float *var_pf_bass, *var_pf_mid, *var_pf_treb, *var_pf_bass_att, *var_pf_mid_att, *var_pf_treb_att;
 	float *var_pf_r, *var_pf_g, *var_pf_b, *var_pf_a;
     float *var_pf_samples;
+    float *var_pf_additive;
+    float *var_pf_thick;
+    float *var_pf_b_spectrum;
+    float *var_pf_b_usedots;
 
 	// for per-point expression evaluation:
 		NSEEL_VMCTX m_pp_eel;
@@ -445,6 +449,7 @@ public:
     float *var_pv_aspectx, *var_pv_aspecty;
 
 	float q_values_after_init_code[NUM_Q_VAR];
+    float t_values_after_init_code[NUM_T_VAR];
     float monitor_after_init_code;
 
     float GetPresetStartTime() { return m_fPresetStartTime; }

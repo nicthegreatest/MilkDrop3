@@ -74,6 +74,7 @@ public:
 		char          szFileName[MAX_PATH];
         char          m_szExpr[768];
 		int           nLoaded;	// 0 for not loaded, 1 for loaded, 2 for failed.
+        bool          bIsUserSprite;
 		int           nTexSize;
 		int           img_w, img_h;
 		int           tex_w, tex_h;

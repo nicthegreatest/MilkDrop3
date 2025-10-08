@@ -422,6 +422,10 @@ void CState::RegisterBuiltInVariables(int flags)
 	        m_wave[i].var_pf_b          = NSEEL_VM_regvar(m_wave[i].m_pf_eel, "b");         // i/o
 	        m_wave[i].var_pf_a          = NSEEL_VM_regvar(m_wave[i].m_pf_eel, "a");         // i/o
             m_wave[i].var_pf_samples    = NSEEL_VM_regvar(m_wave[i].m_pf_eel, "samples");   // i/o
+            m_wave[i].var_pf_additive   = NSEEL_VM_regvar(m_wave[i].m_pf_eel, "additive");
+            m_wave[i].var_pf_thick      = NSEEL_VM_regvar(m_wave[i].m_pf_eel, "thick");
+            m_wave[i].var_pf_b_spectrum = NSEEL_VM_regvar(m_wave[i].m_pf_eel, "spectrum");
+            m_wave[i].var_pf_b_usedots  = NSEEL_VM_regvar(m_wave[i].m_pf_eel, "usedots");
 
 	        NSEEL_VM_freevars(m_wave[i].m_pp_eel);
 	        m_wave[i].var_pp_time		= NSEEL_VM_regvar(m_wave[i].m_pp_eel, "time");		// i
@@ -1463,13 +1467,13 @@ void CState::FreeVarsAndCode(bool bFree)
 
 void CState::StripLinefeedCharsAndComments(char *src, char *dest)
 {
-	// replaces all LINEFEED_CONTROL_CHAR characters in src with a space in dest;
-	// also strips out all comments (beginning with '//' and going til end of line).
+	// replaces all LINEFEED_CONTROL_CHAR characters in src with a semicolon in dest;
+	// also strips out all comments (beginning with '//' or '\\' and going til end of line).
 	// Restriction: sizeof(dest) must be >= sizeof(src).
 
 	int i2 = 0;
 	int len = strlen(src);
-	int bComment = false;
+	bool bComment = false;
 	for (int i=0; i<len; i++)
 	{
 		if (bComment)
@@ -1479,10 +1483,18 @@ void CState::StripLinefeedCharsAndComments(char *src, char *dest)
 		}
 		else
 		{
-			if ((src[i] =='\\' && src[i+1] =='\\') || (src[i] =='/' && src[i+1] =='/'))
+			if (i+1 < len && ((src[i] == '/' && src[i+1] == '/') || (src[i] == '\\' && src[i+1] == '\\')))
+            {
 				bComment = true;
-			else if (src[i] != LINEFEED_CONTROL_CHAR)
-				dest[i2++] = src[i];
+                i++;
+            }
+			else
+            {
+                if (src[i] == LINEFEED_CONTROL_CHAR)
+                    dest[i2++] = ';';
+                else
+				    dest[i2++] = src[i];
+            }
 		}
 	}
 	dest[i2] = 0;

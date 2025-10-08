@@ -5,13 +5,10 @@ This file outlines the remaining tasks to complete the Linux port of MilkDrop3.
 ## High Priority
 
 - **Reference `MilkDrop3-Windows` for feature implementation:** When implementing or porting features, refer to the `MilkDrop3-Windows` directory for the original implementation details and logic.
-- **Fix black screen after preset load:** This is the most critical issue, as it prevents any visual output from presets. This needs to be debugged thoroughly.
+- **Fix EEL script compilation and execution:** Presets are not rendering correctly due to errors in the EEL scripts. This is the new highest priority.
 - **Implement proper preset file browser:** Replace the hardcoded preset loading with a functional file browser to allow users to select any `.milk` file.
 - **Implement "Save Preset" functionality:** Allow users to save modified presets.
 - **Implement "Toggle Help" and "Toggle Info" display:** Show actual help text and preset information.
-- **Implement `CPlugin::DrawCustomWaves()` and `CPlugin::DrawMotionVectors()`:** These are currently stubs and are essential for many presets.
-- **Implement `CPlugin::ShowSongTitleAnim()` and `CPlugin::DrawUserSprites()`:** These are for visual feedback and effects.
-- **Implement `CPlugin::GenWarpPShaderText()` and `CPlugin::GenCompPShaderText()`:** These are crucial for dynamic shader generation.
 
 ## Medium Priority
 
@@ -92,3 +89,6 @@ This file outlines the remaining tasks to complete the Linux port of MilkDrop3.
     - The application now compiles and runs reliably in a headless environment using `Xvfb`.
 
 - **Removed Windows API Dependencies:** The core `pluginshell` and `menu` classes have been refactored to remove Windows-specific types from their public interfaces. Most Windows-specific functions have been stubbed out or replaced.
+- **Fix black screen after preset load:** The initial black screen issue has been resolved by enabling the rendering pipeline and implementing basic drawing functions. Further work is required to fix EEL script execution.
+- **Implement basic drawing functions:** `DrawCustomWaves`, `DrawCustomShapes`, and `DrawMotionVectors` now have basic implementations, allowing for some visual output.
+- **Fix EEL script parsing:** Corrected a bug in `StripLinefeedCharsAndComments` that was causing EEL script compilation to fail.
