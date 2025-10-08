@@ -4,6 +4,6 @@
 #include <string>
 
 // Function to retrieve a localized string from the language pack
-const char* wasabiApiLangString(int resource_id, char* buf, int buf_len);
+const char* wasabiApiLangString(char* buf, int buf_len, int resource_id);
 
 #endif // __WASABI_H__

@@ -42,7 +42,7 @@ extern CPlugin *g_plugin;
 
 CMilkMenuItem::CMilkMenuItem()
 {
-	wasabiApiLangString(IDS_UNTITLED_MENU_ITEM, m_szName, sizeof(m_szName));
+	wasabiApiLangString(m_szName, sizeof(m_szName), IDS_UNTITLED_MENU_ITEM);
 	m_szToolTip[0] = 0;
 	m_type = MENUITEMTYPE_BUNK;
 	m_fMin = 0.0f;
@@ -113,7 +113,7 @@ void CMilkMenu::Reset()
 	for (int i=0; i<MAX_CHILD_MENUS; i++)
 		m_ppChildMenu[i] = NULL;
 	m_pFirstChildItem = NULL;
-	wasabiApiLangString(IDS_UNTITLED_MENU, m_szMenuName, sizeof(m_szMenuName));
+	wasabiApiLangString(m_szMenuName, sizeof(m_szMenuName), IDS_UNTITLED_MENU);
 	m_nChildMenus = 0;
 	m_nChildItems = 0;
 	m_nCurSel = 0;

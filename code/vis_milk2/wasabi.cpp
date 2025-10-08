@@ -71,7 +71,7 @@ void InitLangStringTable()
     g_lang_table_initialized = true;
 }
 
-const char* wasabiApiLangString(int resource_id, char* buf, int buf_len)
+const char* wasabiApiLangString(char* buf, int buf_len, int resource_id)
 {
     if (!g_lang_table_initialized)
     {
