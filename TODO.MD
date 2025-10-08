@@ -4,8 +4,50 @@ This file outlines the remaining tasks to complete the Linux port of MilkDrop3.
 
 ## High Priority
 
-- **Implement a proper preset file browser:** Currently, presets are loaded via hardcoded paths. A user-friendly interface to browse and select preset files is needed.
-- **Fix black screen after preset load:** Investigate why presets are not rendering after being loaded, even though no errors are reported.
+- **Reference `MilkDrop3-Windows` for feature implementation:** When implementing or porting features, refer to the `MilkDrop3-Windows` directory for the original implementation details and logic.
+- **Fix black screen after preset load:** This is the most critical issue, as it prevents any visual output from presets. This needs to be debugged thoroughly.
+- **Implement proper preset file browser:** Replace the hardcoded preset loading with a functional file browser to allow users to select any `.milk` file.
+- **Implement "Save Preset" functionality:** Allow users to save modified presets.
+- **Implement "Toggle Help" and "Toggle Info" display:** Show actual help text and preset information.
+- **Implement `CPlugin::DrawCustomWaves()` and `CPlugin::DrawMotionVectors()`:** These are currently stubs and are essential for many presets.
+- **Implement `CPlugin::ShowSongTitleAnim()` and `CPlugin::DrawUserSprites()`:** These are for visual feedback and effects.
+- **Implement `CPlugin::GenWarpPShaderText()` and `CPlugin::GenCompPShaderText()`:** These are crucial for dynamic shader generation.
+
+## Medium Priority
+
+- **Implement advanced preset features:** Double-presets (.milk2 files) and their associated UI/logic.
+- **Implement advanced key shortcuts:** (majuscule/minuscule, player control, filtering).
+- **Implement Always on top window and borderless mode:** (beyond basic fullscreen toggle).
+- **Implement Multiple monitor stretching.**
+- **Implement Real-time toggling FPS and auto transition seconds.**
+- **Implement Increased number of shapes (16 vs 4) and waves (16 vs 4).**
+- **Implement `.shape` and `.wave` file export.**
+- **Implement Expanded q variables (q1-q64).**
+- **Implement Deep-mash-up.**
+- **Implement Sprite blending modes and controls.**
+- **Implement MilkPanel:** (shader editor, options, playlist management, dark mode, save button).
+- **Implement Playlist support:** (add/remove, load/save).
+- **Implement Startup playlist selection.**
+- **Implement Hide from taskbar/errors.**
+- **Implement Select screen number for startup.**
+- **Implement Save image directly in .milk/.milk2.**
+- **Implement Drag and Drop.**
+- **Implement Delete mode.**
+- **Implement Auto-update shader on compilation error.**
+- **Implement Sprites mode vs. Messages mode.**
+- **Implement DPI scaling fixes.**
+- **Implement Adjustable font size.**
+- **Implement Launch external programs.**
+- **Implement Hi-Res audio support.**
+- **Implement ATI/AMD PS4 shaders.**
+- **Implement New shader cache.**
+- **Implement New custom VM.**
+- **Implement Modern presets.**
+- **Implement Hardcut Mode #7.**
+- **Implement VJ mode.**
+- **Implement See all Q variables values at once.**
+- **Implement New transition effects.**
+- **Implement Optimized functions.**
 
 ## Completed
 
