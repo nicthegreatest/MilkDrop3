@@ -124,11 +124,12 @@ protected:
     virtual void OnAltK() { };
 
     int m_show_help;
-private:
+protected:
     int          m_frame;
     float        m_time;
     float        m_fps;
     GLContext*   m_lpDX;
+private:
     char      m_szPluginsDirPath[1024];
     char      m_szConfigIniFile[1024];
 	char         m_szConfigIniFileA[1024];

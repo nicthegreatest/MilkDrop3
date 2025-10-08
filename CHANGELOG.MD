@@ -17,6 +17,17 @@ By following these instructions, you will help us maintain a clean, accurate, an
 
 ## [Unreleased]
 
+### Added
+- Implemented the full menu system, including the main menu and sub-menus for Wave, Custom Waves, Custom Shapes, Motion, and Post Processing.
+- Populated all menus with their respective controls, linking them to the application's state variables.
+- Implemented full keyboard navigation for the menu system, including up/down for selection, left/right for value changes, Enter for activation, and Escape for exiting.
+- Added callbacks for all menu actions, including preset loading/saving, fullscreen toggling, and info display.
+
+### Changed
+- Refactored the menu callback system to use static member functions, resolving build errors related to non-static member function pointers.
+- The `CPlugin::ToggleFullscreen` function is now fully implemented using GLFW for cross-platform window management.
+- The `CPluginShell::m_lpDX` member is now `protected` to allow derived classes to access the `GLContext`.
+
 ### Fixed
 - Resolved all compiler warnings, including `const`-correctness issues and potential buffer overflows.
 - Fixed several build errors to get the project to compile successfully.

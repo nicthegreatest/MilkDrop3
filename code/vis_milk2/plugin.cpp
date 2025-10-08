@@ -192,6 +192,7 @@ void OnUserEditedShapecodeInit(LPARAM param1, LPARAM param2) { g_plugin->m_pStat
 void OnUserEditedWarpShaders(LPARAM param1, LPARAM param2) { /* Stub */ }
 void OnUserEditedCompShaders(LPARAM param1, LPARAM param2) { /* Stub */ }
 
+
 //char* g_szHelp = (char*)"F1 toggles this help screen\nL brings up the preset list\nScroll Lock toggles preset lock (hard cuts only)\n+/- changes rating for current preset\nR chooses a new random preset\nH does an instant hard cut to a new random preset\n\nSee readme.txt for more...";
 //int g_szHelp_W = 0;
 
@@ -712,7 +713,129 @@ void CPlugin::UpdatePresetList(bool bBackground, bool bForce, bool bTryReselectC
     m_nPresets = m_presets.size();
     m_bPresetListReady = true;
 }
-void CPlugin::BuildMenus() { }
+// Builds the entire menu structure for the plugin.
+void CPlugin::BuildMenus()
+{
+    // Main Menu
+    m_menuPreset.Init("Main Menu");
+    m_menuPreset.AddItem("Load Preset", NULL, MENUITEMTYPE_BUNK, "Load a preset from disk", 0, 0, LoadPreset_Callback);
+    m_menuPreset.AddItem("Save Preset", NULL, MENUITEMTYPE_BUNK, "Save current settings to a new preset file", 0, 0, SavePreset_Callback);
+    m_menuPreset.AddItem("---", NULL, MENUITEMTYPE_BUNK, "", 0, 0, NULL);
+    m_menuPreset.AddItem("Next Preset", NULL, MENUITEMTYPE_BUNK, "Switch to the next preset", 0, 0, NextPreset_Callback);
+    m_menuPreset.AddItem("Previous Preset", NULL, MENUITEMTYPE_BUNK, "Switch to the previous preset", 0, 0, PrevPreset_Callback);
+    m_menuPreset.AddItem("Random Preset", NULL, MENUITEMTYPE_BUNK, "Switch to a random preset", 0, 0, RandomPreset_Callback);
+    m_menuPreset.AddItem("---", NULL, MENUITEMTYPE_BUNK, "", 0, 0, NULL);
+
+    // Sub-menus
+    m_menuWave.Init("Wave");
+    m_menuWave.AddItem("Wave Mode", &m_pState->m_nWaveMode, MENUITEMTYPE_INT, "Waveform shape", 0, 7);
+    m_menuWave.AddItem("Additive Waves", &m_pState->m_bAdditiveWaves, MENUITEMTYPE_BOOL, "Draw waves on top of each other");
+    m_menuWave.AddItem("Wave Dots", &m_pState->m_bWaveDots, MENUITEMTYPE_BOOL, "Draw waves as dots instead of lines");
+    m_menuWave.AddItem("Wave Thick", &m_pState->m_bWaveThick, MENUITEMTYPE_BOOL, "Draw thick lines for waves");
+    m_menuWave.AddItem("Modulate Alpha by Volume", &m_pState->m_bModWaveAlphaByVolume, MENUITEMTYPE_BOOL, "Modulate wave transparency by volume");
+    m_menuWave.AddItem("Wave Alpha", &m_pState->m_fWaveAlpha, MENUITEMTYPE_BLENDABLE, "Wave transparency", 0, 1);
+    m_menuWave.AddItem("Wave Scale", &m_pState->m_fWaveScale, MENUITEMTYPE_BLENDABLE, "Wave size", 0.01f, 100.0f);
+    m_menuWave.AddItem("Wave Smoothing", &m_pState->m_fWaveSmoothing, MENUITEMTYPE_BLENDABLE, "Wave smoothing", 0, 0.99f);
+    m_menuWave.AddItem("Wave Parameter", &m_pState->m_fWaveParam, MENUITEMTYPE_BLENDABLE, "Varies by wave mode", -1, 1);
+    m_menuWave.AddItem("Wave Red", &m_pState->m_fWaveR, MENUITEMTYPE_BLENDABLE, "Wave red channel", 0, 1);
+    m_menuWave.AddItem("Wave Green", &m_pState->m_fWaveG, MENUITEMTYPE_BLENDABLE, "Wave green channel", 0, 1);
+    m_menuWave.AddItem("Wave Blue", &m_pState->m_fWaveB, MENUITEMTYPE_BLENDABLE, "Wave blue channel", 0, 1);
+    m_menuWave.AddItem("Wave X", &m_pState->m_fWaveX, MENUITEMTYPE_BLENDABLE, "Wave horizontal position", 0, 1);
+    m_menuWave.AddItem("Wave Y", &m_pState->m_fWaveY, MENUITEMTYPE_BLENDABLE, "Wave vertical position", 0, 1);
+    m_menuWave.AddItem("Mod Alpha Start", &m_pState->m_fModWaveAlphaStart, MENUITEMTYPE_BLENDABLE, "Volume at which wave begins to fade in", 0, 1);
+    m_menuWave.AddItem("Mod Alpha End", &m_pState->m_fModWaveAlphaEnd, MENUITEMTYPE_BLENDABLE, "Volume at which wave is fully visible", 0, 1);
+
+    m_menuCustomWave.Init("Custom Waves");
+    for (int i = 0; i < MAX_CUSTOM_WAVES; i++)
+    {
+        char szMenuName[64];
+        sprintf(szMenuName, "Wave %d", i + 1);
+        m_menuWavecode[i].Init(szMenuName);
+        m_menuWavecode[i].AddItem("Enabled", &m_pState->m_wave[i].enabled, MENUITEMTYPE_BOOL, "Enable this wave");
+        m_menuWavecode[i].AddItem("Spectrum", &m_pState->m_wave[i].bSpectrum, MENUITEMTYPE_BOOL, "Use spectrum data instead of waveform");
+        m_menuWavecode[i].AddItem("Use Dots", &m_pState->m_wave[i].bUseDots, MENUITEMTYPE_BOOL, "Draw with dots instead of lines");
+        m_menuWavecode[i].AddItem("Draw Thick", &m_pState->m_wave[i].bDrawThick, MENUITEMTYPE_BOOL, "Draw thick lines");
+        m_menuWavecode[i].AddItem("Additive", &m_pState->m_wave[i].bAdditive, MENUITEMTYPE_BOOL, "Additive blending");
+        m_menuWavecode[i].AddItem("Scaling", &m_pState->m_wave[i].scaling, MENUITEMTYPE_LOGBLENDABLE, "Scaling factor", 0.01f, 100.0f);
+        m_menuWavecode[i].AddItem("Smoothing", &m_pState->m_wave[i].smoothing, MENUITEMTYPE_BLENDABLE, "Smoothing amount", 0.0f, 0.99f);
+        m_menuWavecode[i].AddItem("Red", &m_pState->m_wave[i].r, MENUITEMTYPE_BLENDABLE, "Red channel", 0.0f, 1.0f);
+        m_menuWavecode[i].AddItem("Green", &m_pState->m_wave[i].g, MENUITEMTYPE_BLENDABLE, "Green channel", 0.0f, 1.0f);
+        m_menuWavecode[i].AddItem("Blue", &m_pState->m_wave[i].b, MENUITEMTYPE_BLENDABLE, "Blue channel", 0.0f, 1.0f);
+        m_menuWavecode[i].AddItem("Alpha", &m_pState->m_wave[i].a, MENUITEMTYPE_BLENDABLE, "Transparency", 0.0f, 1.0f);
+        m_menuWavecode[i].AddItem("Samples", &m_pState->m_wave[i].samples, MENUITEMTYPE_INT, "Number of samples", 2, 576);
+        m_menuCustomWave.AddChildMenu(&m_menuWavecode[i]);
+    }
+
+    m_menuCustomShape.Init("Custom Shapes");
+    for (int i = 0; i < MAX_CUSTOM_SHAPES; i++)
+    {
+        char szMenuName[64];
+        sprintf(szMenuName, "Shape %d", i + 1);
+        m_menuShapecode[i].Init(szMenuName);
+        m_menuShapecode[i].AddItem("Enabled", &m_pState->m_shape[i].enabled, MENUITEMTYPE_BOOL, "Enable this shape");
+        m_menuShapecode[i].AddItem("Sides", &m_pState->m_shape[i].sides, MENUITEMTYPE_INT, "Number of sides", 3, 100);
+        m_menuShapecode[i].AddItem("Instances", &m_pState->m_shape[i].instances, MENUITEMTYPE_INT, "Number of instances", 1, 1024);
+        m_menuShapecode[i].AddItem("Additive", &m_pState->m_shape[i].additive, MENUITEMTYPE_BOOL, "Additive blending");
+        m_menuShapecode[i].AddItem("Thick Outline", &m_pState->m_shape[i].thickOutline, MENUITEMTYPE_BOOL, "Draw with a thick outline");
+        m_menuShapecode[i].AddItem("Textured", &m_pState->m_shape[i].textured, MENUITEMTYPE_BOOL, "Apply texture to the shape");
+        m_menuShapecode[i].AddItem("X", &m_pState->m_shape[i].x, MENUITEMTYPE_BLENDABLE, "X position", 0.0f, 1.0f);
+        m_menuShapecode[i].AddItem("Y", &m_pState->m_shape[i].y, MENUITEMTYPE_BLENDABLE, "Y position", 0.0f, 1.0f);
+        m_menuShapecode[i].AddItem("Radius", &m_pState->m_shape[i].rad, MENUITEMTYPE_BLENDABLE, "Radius", 0.0f, 2.0f);
+        m_menuShapecode[i].AddItem("Angle", &m_pState->m_shape[i].ang, MENUITEMTYPE_BLENDABLE, "Angle", 0.0f, 360.0f);
+        m_menuShapecode[i].AddItem("Red", &m_pState->m_shape[i].r, MENUITEMTYPE_BLENDABLE, "Red channel", 0.0f, 1.0f);
+        m_menuShapecode[i].AddItem("Green", &m_pState->m_shape[i].g, MENUITEMTYPE_BLENDABLE, "Green channel", 0.0f, 1.0f);
+        m_menuShapecode[i].AddItem("Blue", &m_pState->m_shape[i].b, MENUITEMTYPE_BLENDABLE, "Blue channel", 0.0f, 1.0f);
+        m_menuShapecode[i].AddItem("Alpha", &m_pState->m_shape[i].a, MENUITEMTYPE_BLENDABLE, "Transparency", 0.0f, 1.0f);
+        m_menuShapecode[i].AddItem("Border Red", &m_pState->m_shape[i].border_r, MENUITEMTYPE_BLENDABLE, "Border red channel", 0.0f, 1.0f);
+        m_menuShapecode[i].AddItem("Border Green", &m_pState->m_shape[i].border_g, MENUITEMTYPE_BLENDABLE, "Border green channel", 0.0f, 1.0f);
+        m_menuShapecode[i].AddItem("Border Blue", &m_pState->m_shape[i].border_b, MENUITEMTYPE_BLENDABLE, "Border blue channel", 0.0f, 1.0f);
+        m_menuShapecode[i].AddItem("Border Alpha", &m_pState->m_shape[i].border_a, MENUITEMTYPE_BLENDABLE, "Border transparency", 0.0f, 1.0f);
+        m_menuShapecode[i].AddItem("Texture Zoom", &m_pState->m_shape[i].tex_zoom, MENUITEMTYPE_BLENDABLE, "Texture zoom", 0.01f, 100.0f);
+        m_menuShapecode[i].AddItem("Texture Angle", &m_pState->m_shape[i].tex_ang, MENUITEMTYPE_BLENDABLE, "Texture angle", 0.0f, 360.0f);
+        m_menuCustomShape.AddChildMenu(&m_menuShapecode[i]);
+    }
+    m_menuMotion.Init("Motion");
+    m_menuMotion.AddItem("Warp Amount", &m_pState->m_fWarpAmount, MENUITEMTYPE_BLENDABLE, "Amount of warp", 0, 10);
+    m_menuMotion.AddItem("Warp Speed", &m_pState->m_fWarpAnimSpeed, MENUITEMTYPE_LOGBLENDABLE, "Warp animation speed", 0.1f, 10.0f);
+    m_menuMotion.AddItem("Rotation", &m_pState->m_fRot, MENUITEMTYPE_BLENDABLE, "Image rotation", -10, 10);
+    m_menuMotion.AddItem("Rotation Center X", &m_pState->m_fRotCX, MENUITEMTYPE_BLENDABLE, "Rotation center X", 0, 1);
+    m_menuMotion.AddItem("Rotation Center Y", &m_pState->m_fRotCY, MENUITEMTYPE_BLENDABLE, "Rotation center Y", 0, 1);
+    m_menuMotion.AddItem("Zoom", &m_pState->m_fZoom, MENUITEMTYPE_LOGBLENDABLE, "Image zoom", 0.01f, 100.0f);
+    m_menuMotion.AddItem("Zoom Exponent", &m_pState->m_fZoomExponent, MENUITEMTYPE_BLENDABLE, "Zoom curve", 0.01f, 8.0f);
+    m_menuMotion.AddItem("X Push", &m_pState->m_fXPush, MENUITEMTYPE_BLENDABLE, "Horizontal motion", -2, 2);
+    m_menuMotion.AddItem("Y Push", &m_pState->m_fYPush, MENUITEMTYPE_BLENDABLE, "Vertical motion", -2, 2);
+    m_menuMotion.AddItem("Stretch X", &m_pState->m_fStretchX, MENUITEMTYPE_BLENDABLE, "Horizontal stretch", 0.01f, 100.0f);
+    m_menuMotion.AddItem("Stretch Y", &m_pState->m_fStretchY, MENUITEMTYPE_BLENDABLE, "Vertical stretch", 0.01f, 100.0f);
+
+    m_menuPost.Init("Post Processing");
+    m_menuPost.AddItem("Decay", &m_pState->m_fDecay, MENUITEMTYPE_BLENDABLE, "Feedback decay", 0, 1);
+    m_menuPost.AddItem("Gamma", &m_pState->m_fGammaAdj, MENUITEMTYPE_BLENDABLE, "Gamma correction", 0, 4);
+    m_menuPost.AddItem("Video Echo Zoom", &m_pState->m_fVideoEchoZoom, MENUITEMTYPE_BLENDABLE, "Video echo zoom", 0, 4);
+    m_menuPost.AddItem("Video Echo Alpha", &m_pState->m_fVideoEchoAlpha, MENUITEMTYPE_BLENDABLE, "Video echo transparency", 0, 1);
+    m_menuPost.AddItem("Video Echo Orientation", &m_pState->m_nVideoEchoOrientation, MENUITEMTYPE_INT, "Video echo orientation", 0, 3);
+    m_menuPost.AddItem("Texture Wrap", &m_pState->m_bTexWrap, MENUITEMTYPE_BOOL, "Wrap texture coordinates");
+    m_menuPost.AddItem("Darken Center", &m_pState->m_bDarkenCenter, MENUITEMTYPE_BOOL, "Darken the center of the screen");
+    m_menuPost.AddItem("Brighten", &m_pState->m_bBrighten, MENUITEMTYPE_BOOL, "Brighten the image");
+    m_menuPost.AddItem("Darken", &m_pState->m_bDarken, MENUITEMTYPE_BOOL, "Darken the image");
+    m_menuPost.AddItem("Solarize", &m_pState->m_bSolarize, MENUITEMTYPE_BOOL, "Solarize the image");
+    m_menuPost.AddItem("Invert", &m_pState->m_bInvert, MENUITEMTYPE_BOOL, "Invert the image colors");
+
+    m_menuPreset.AddChildMenu(&m_menuWave);
+    m_menuPreset.AddChildMenu(&m_menuCustomWave);
+    m_menuPreset.AddChildMenu(&m_menuCustomShape);
+    m_menuPreset.AddChildMenu(&m_menuMotion);
+    m_menuPreset.AddChildMenu(&m_menuPost);
+
+    m_menuPreset.AddItem("---", NULL, MENUITEMTYPE_BUNK, "", 0, 0, NULL);
+    m_menuPreset.AddItem("Lock/Unlock Preset", NULL, MENUITEMTYPE_BUNK, "Toggle preset lock", 0, 0, LockPreset_Callback);
+    m_menuPreset.AddItem("Toggle Help", NULL, MENUITEMTYPE_BUNK, "Toggle help text", 0, 0, ToggleHelp_Callback);
+    m_menuPreset.AddItem("Toggle Info", NULL, MENUITEMTYPE_BUNK, "Toggle preset and FPS info", 0, 0, ToggleInfo_Callback);
+    m_menuPreset.AddItem("Toggle Fullscreen", NULL, MENUITEMTYPE_BUNK, "Toggle fullscreen mode", 0, 0, ToggleFullscreen_Callback);
+
+    // Set the current menu to the main menu
+    m_pCurMenu = &m_menuPreset;
+}
+
 void CPlugin::SetMenusForPresetVersion(int WarpPSVersion, int CompPSVersion) { }
 void CPlugin::DoCustomSoundAnalysis()
 {
@@ -825,6 +948,47 @@ bool CPlugin::RecompileVShader(const char* szShadersText, VShaderInfo *si, int s
 bool CPlugin::RecompilePShader(const char* szShadersText, PShaderInfo *si, int shaderType, bool bHardErrors, int PSVersion) { return true; }
 bool CPlugin::EvictSomeTexture() { return true; }
 void CPlugin::OnAltK() {}
+
+// Toggles the application between fullscreen and windowed mode.
+void CPlugin::ToggleFullscreen()
+{
+    if (!m_lpDX) return;
+
+    GLFWwindow* window = m_lpDX->GetWindow();
+    if (!window) return;
+
+    if (glfwGetWindowMonitor(window))
+    {
+        // Currently in fullscreen mode, switch to windowed.
+        // The last used windowed mode dimensions are restored.
+        glfwSetWindowMonitor(window, NULL, 100, 100, m_lpDX->m_window_width, m_lpDX->m_window_height, 0);
+    }
+    else
+    {
+        // Currently in windowed mode, switch to fullscreen.
+        // Save the current window size before switching.
+        glfwGetWindowSize(window, &m_lpDX->m_window_width, &m_lpDX->m_window_height);
+        GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+        if (monitor)
+        {
+            const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+            if (mode)
+            {
+                glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+            }
+        }
+    }
+}
+
+void CPlugin::LoadPreset_Callback(LPARAM param1, LPARAM param2) { g_plugin->m_UI_mode = UI_LOAD; g_plugin->m_bShowMenu = false; }
+void CPlugin::SavePreset_Callback(LPARAM param1, LPARAM param2) { g_plugin->m_UI_mode = UI_SAVEAS; g_plugin->m_bShowMenu = false; }
+void CPlugin::NextPreset_Callback(LPARAM param1, LPARAM param2) { g_plugin->NextPreset(g_plugin->m_fBlendTimeUser); }
+void CPlugin::PrevPreset_Callback(LPARAM param1, LPARAM param2) { g_plugin->PrevPreset(g_plugin->m_fBlendTimeUser); }
+void CPlugin::RandomPreset_Callback(LPARAM param1, LPARAM param2) { g_plugin->LoadRandomPreset(g_plugin->m_fBlendTimeUser); }
+void CPlugin::LockPreset_Callback(LPARAM param1, LPARAM param2) { g_plugin->m_bPresetLockedByUser = !g_plugin->m_bPresetLockedByUser; }
+void CPlugin::ToggleHelp_Callback(LPARAM param1, LPARAM param2) { g_plugin->m_bShowShaderHelp = !g_plugin->m_bShowShaderHelp; g_plugin->m_bShowMenu = false; }
+void CPlugin::ToggleInfo_Callback(LPARAM param1, LPARAM param2) { g_plugin->m_bShowPresetInfo = !g_plugin->m_bShowPresetInfo; }
+void CPlugin::ToggleFullscreen_Callback(LPARAM param1, LPARAM param2) { g_plugin->ToggleFullscreen(); }
 
 void CShaderParams::Clear()
 {

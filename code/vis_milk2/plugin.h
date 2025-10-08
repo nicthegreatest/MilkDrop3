@@ -655,6 +655,18 @@ public:
         virtual void MyRenderUI(int *upper_left_corner_y, int *upper_right_corner_y, int *lower_left_corner_y, int *lower_right_corner_y, int xL, int xR);
         virtual void MyKeyHandler(int key);
         virtual void OnAltK();
+        virtual void ToggleFullscreen();
+
+        // Static callbacks for menu items
+        static void LoadPreset_Callback(LPARAM param1, LPARAM param2);
+        static void SavePreset_Callback(LPARAM param1, LPARAM param2);
+        static void NextPreset_Callback(LPARAM param1, LPARAM param2);
+        static void PrevPreset_Callback(LPARAM param1, LPARAM param2);
+        static void RandomPreset_Callback(LPARAM param1, LPARAM param2);
+        static void LockPreset_Callback(LPARAM param1, LPARAM param2);
+        static void ToggleHelp_Callback(LPARAM param1, LPARAM param2);
+        static void ToggleInfo_Callback(LPARAM param1, LPARAM param2);
+        static void ToggleFullscreen_Callback(LPARAM param1, LPARAM param2);
 };
 
 #endif
