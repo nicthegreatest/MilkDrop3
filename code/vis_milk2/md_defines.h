@@ -55,6 +55,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MAX_CUSTOM_MESSAGES 100			// 00-99
 #define MAX_CUSTOM_WAVES  4
 #define MAX_CUSTOM_SHAPES 4
+#define MAX_WAVE_SAMPLES 1024
 
 // aspect ratio makes the motion in the UV field [0..1] cover the screen appropriately,
 //#define ASPECT_X    1.00
