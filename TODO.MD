@@ -4,9 +4,9 @@ This file outlines the remaining tasks to complete the Linux port of MilkDrop3.
 
 ## High Priority
 
-- **Address Compiler Warnings:** The build still produces a number of warnings related to `const`-correctness and other issues in the `ns-eel2` library. These should be cleaned up.
-
 ## Completed
+
+- **Address Compiler Warnings:** The build still produces a number of warnings related to `const`-correctness and other issues in the `ns-eel2` library. These should be cleaned up.
 
 - **Implement Full Menu Rendering:**
     - Integrated FreeType for text rendering.

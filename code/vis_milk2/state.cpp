@@ -848,7 +848,7 @@ void CState::StartBlendFrom(CState *s_from, float fAnimTime, float fTimespan)
 
 }
 
-void WriteCode(FILE* fOut, int i, char* pStr, char* prefix, bool bPrependApostrophe = false)
+static void WriteCode(FILE* fOut, int i, char* pStr, const char* prefix, bool bPrependApostrophe = false)
 {
 	char szLineName[32];
 	int line = 1;
@@ -861,7 +861,7 @@ void WriteCode(FILE* fOut, int i, char* pStr, char* prefix, bool bPrependApostro
 				pStr[char_pos] != LINEFEED_CONTROL_CHAR)
 			char_pos++;
 
-		sprintf(szLineName, "%s%d", prefix, line);
+		snprintf(szLineName, sizeof(szLineName), "%s%d", prefix, line);
 
 		char ch = pStr[char_pos];
 		pStr[char_pos] = 0;

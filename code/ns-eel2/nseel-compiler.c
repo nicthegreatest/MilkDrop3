@@ -2807,7 +2807,7 @@ static float NSEEL_CGEN_CALL _eel_resetSysMemRegion(void *opaque, INT_PTR num_pa
 	InitRegion_context(state);
 	return 0.0f;
 }
-int32_t get_float(char *val, float *F)
+int32_t get_float(const char *val, float *F)
 {
 	char *eptr;
 	errno = 0;
@@ -2821,15 +2821,17 @@ int32_t get_float(char *val, float *F)
 }
 float* string2FloatArray(const char *frArbitraryEqString, int32_t *elements)
 {
-	char *p = frArbitraryEqString;
-	char *counter = frArbitraryEqString;
+	const char *p = frArbitraryEqString;
+	const char *counter = frArbitraryEqString;
 	int32_t i = 0, count = 0;
 	float number;
 	while (*p)
 	{
 		if (get_float(p, &number))
 		{
-			strtod(p, &p);
+			char *p_end;
+			strtof(p, &p_end);
+			p = p_end;
 			count++;
 		}
 		else
@@ -2841,7 +2843,9 @@ float* string2FloatArray(const char *frArbitraryEqString, int32_t *elements)
 	{
 		if (get_float(counter, &number))
 		{
-			arrayF[i] = (float)strtod(counter, &counter);
+			char *counter_end;
+			arrayF[i] = strtof(counter, &counter_end);
+			counter = counter_end;
 			i++;
 		}
 		else
@@ -2861,7 +2865,7 @@ static float NSEEL_CGEN_CALL _eel_importFloatArrayFromString(void *opaque, float
 	free(convertedFLT);
 	return (float)elements;
 }
-int32_t get_double(char* val, double* F)
+int32_t get_double(const char* val, double* F)
 {
 	char* eptr;
 	errno = 0;
@@ -2875,15 +2879,17 @@ int32_t get_double(char* val, double* F)
 }
 double* string2DoubleArray(const char* frArbitraryEqString, int32_t* elements)
 {
-	char* p = frArbitraryEqString;
-	char* counter = frArbitraryEqString;
+	const char* p = frArbitraryEqString;
+	const char* counter = frArbitraryEqString;
 	int32_t i = 0, count = 0;
 	double number;
 	while (*p)
 	{
 		if (get_double(p, &number))
 		{
-			strtod(p, &p);
+			char *p_end;
+			strtod(p, &p_end);
+			p = p_end;
 			count++;
 		}
 		else
@@ -2895,7 +2901,9 @@ double* string2DoubleArray(const char* frArbitraryEqString, int32_t* elements)
 	{
 		if (get_double(counter, &number))
 		{
-			arrayF[i] = strtod(counter, &counter);
+			char *counter_end;
+			arrayF[i] = strtod(counter, &counter_end);
+			counter = counter_end;
 			i++;
 		}
 		else

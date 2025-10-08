@@ -129,9 +129,9 @@ private:
     float        m_time;
     float        m_fps;
     GLContext*   m_lpDX;
-    char      m_szPluginsDirPath[260];
-    char      m_szConfigIniFile[260];
-	char         m_szConfigIniFileA[260];
+    char      m_szPluginsDirPath[1024];
+    char      m_szConfigIniFile[1024];
+	char         m_szConfigIniFileA[1024];
 	void* m_lpDDSText; // IDirect3DTexture9
     LPD3DXFONT   m_d3dx_font[NUM_BASIC_FONTS + NUM_EXTRA_FONTS];
     LPD3DXFONT   m_d3dx_desktop_font;

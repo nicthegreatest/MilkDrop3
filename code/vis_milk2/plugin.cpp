@@ -137,16 +137,17 @@ void StripComments(char *str)
     // stub
 }
 
+#include <string>
+
 bool ReadFileToString(const char* szBaseFilename, char* szDestText, int nMaxBytes, bool bConvertLFsToSpecialChar)
 {
-    char szFile[260];
-    sprintf(szFile, "%s%s", g_plugin->GetPluginsDirPath(), szBaseFilename);
+    std::string szFile = std::string(g_plugin->GetPluginsDirPath()) + szBaseFilename;
 
-    FILE* f = fopen(szFile, "rb");
+    FILE* f = fopen(szFile.c_str(), "rb");
     if (!f)
     {
         char buf[1024];
-		sprintf(buf, "Unable to read data file: %s", szFile);
+		snprintf(buf, sizeof(buf), "Unable to read data file: %s", szFile.c_str());
 		g_plugin->dumpmsg(buf);
 		return false;
     }
@@ -309,15 +310,29 @@ void CPlugin::MyPreInitialize()
 	m_nNumericInputDigits = 0;
 	m_supertext.bRedrawSuperText = false;
 	m_supertext.fStartTime = -1.0f;
-    sprintf(m_szMilkdrop2Path, "plugins/MilkDrop2/");
-    sprintf(m_szPresetDir, "%spresets/", m_szMilkdrop2Path);
-    char szConfigDirA[260] = {0};
-    strncpy(szConfigDirA, GetConfigIniFileA(), 260);
+    strncpy(m_szMilkdrop2Path, "plugins/MilkDrop2/", sizeof(m_szMilkdrop2Path) - 1);
+    m_szMilkdrop2Path[sizeof(m_szMilkdrop2Path)-1] = 0;
+
+    std::string presetDir(m_szMilkdrop2Path);
+    presetDir += "presets/";
+    strncpy(m_szPresetDir, presetDir.c_str(), sizeof(m_szPresetDir) - 1);
+    m_szPresetDir[sizeof(m_szPresetDir)-1] = 0;
+
+    char szConfigDirA[1024] = {0};
+    strncpy(szConfigDirA, GetConfigIniFileA(), sizeof(szConfigDirA) - 1);
     char* p = strrchr(szConfigDirA, '/');
     if (!p) p = strrchr(szConfigDirA, '\\');
     if (p) *(p+1) = 0;
-	sprintf(m_szMsgIniFile, "%s%s", szConfigDirA, "milk_msg.ini" );
-	sprintf(m_szImgIniFile, "%s%s", szConfigDirA, "milk_img.ini" );
+
+    std::string msgIniFile(szConfigDirA);
+    msgIniFile += "milk_msg.ini";
+	strncpy(m_szMsgIniFile, msgIniFile.c_str(), sizeof(m_szMsgIniFile) - 1);
+    m_szMsgIniFile[sizeof(m_szMsgIniFile)-1] = 0;
+
+    std::string imgIniFile(szConfigDirA);
+    imgIniFile += "milk_img.ini";
+	strncpy(m_szImgIniFile, imgIniFile.c_str(), sizeof(m_szImgIniFile) - 1);
+    m_szImgIniFile[sizeof(m_szImgIniFile)-1] = 0;
 }
 
 void CPlugin::MyReadConfig() { /* Stub */ }
@@ -656,8 +671,8 @@ void CPlugin::LoadRandomPreset(float fBlendTime)
 {
 	if (m_nPresets - m_nDirs == 0) return;
 	m_nCurrentPreset = m_nDirs + (rand() % (m_nPresets - m_nDirs));
-	char szFile[260];
-	sprintf(szFile, "%s%s", m_szPresetDir, m_presets[m_nCurrentPreset].szFilename.c_str());
+	char szFile[1024];
+	snprintf(szFile, sizeof(szFile), "%s%s", m_szPresetDir, m_presets[m_nCurrentPreset].szFilename.c_str());
     LoadPreset(szFile, fBlendTime);
 }
 void CPlugin::LoadPreset(const char *szPresetFilename, float fBlendTime)
@@ -674,10 +689,9 @@ void CPlugin::UpdatePresetList(bool bBackground, bool bForce, bool bTryReselectC
 
     DIR *dir;
     struct dirent *ent;
-    char preset_dir[1024];
-    sprintf(preset_dir, "%s%s", GetPluginsDirPath(), m_szPresetDir);
+    std::string preset_dir = std::string(GetPluginsDirPath()) + m_szPresetDir;
 
-    if ((dir = opendir(preset_dir)) != NULL) {
+    if ((dir = opendir(preset_dir.c_str())) != NULL) {
         while ((ent = readdir(dir)) != NULL) {
             if (strstr(ent->d_name, ".milk") != NULL) {
                 PresetInfo p;
@@ -691,7 +705,7 @@ void CPlugin::UpdatePresetList(bool bBackground, bool bForce, bool bTryReselectC
     } else {
         // Could not open directory
         char buf[1024];
-        sprintf(buf, "Could not open preset directory: %s", preset_dir);
+        snprintf(buf, sizeof(buf), "Could not open preset directory: %s", preset_dir.c_str());
         dumpmsg(buf);
     }
 

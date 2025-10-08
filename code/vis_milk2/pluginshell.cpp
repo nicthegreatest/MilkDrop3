@@ -53,10 +53,8 @@ CPluginShell::CPluginShell()
 
 unsigned int CPluginShell::LoadShader(const char* vs_file, const char* fs_file)
 {
-    char vs_path[256];
-    char fs_path[256];
-    sprintf(vs_path, "%s%s", GetPluginsDirPath(), vs_file);
-    sprintf(fs_path, "%s%s", GetPluginsDirPath(), fs_file);
+    std::string vs_path = std::string(GetPluginsDirPath()) + vs_file;
+    std::string fs_path = std::string(GetPluginsDirPath()) + fs_file;
 
     std::string vertexCode;
     std::string fragmentCode;
@@ -67,8 +65,8 @@ unsigned int CPluginShell::LoadShader(const char* vs_file, const char* fs_file)
     fShaderFile.exceptions (std::ifstream::failbit | std::ifstream::badbit);
     try
     {
-        vShaderFile.open(vs_path);
-        fShaderFile.open(fs_path);
+        vShaderFile.open(vs_path.c_str());
+        fShaderFile.open(fs_path.c_str());
         std::stringstream vShaderStream, fShaderStream;
         vShaderStream << vShaderFile.rdbuf();
         fShaderStream << fShaderFile.rdbuf();
@@ -358,9 +356,13 @@ int CPluginShell::PluginInitialize(void* device, void* d3dpp, void* window, int 
 	m_fps = 60;
 	m_lpDX = NULL;
 
-    strcpy(m_szPluginsDirPath, "./");
-    sprintf(m_szConfigIniFile, "%smilkdrop.ini", m_szPluginsDirPath);
-	strcpy(m_szConfigIniFileA, m_szConfigIniFile);
+    strncpy(m_szPluginsDirPath, "./", sizeof(m_szPluginsDirPath) - 1);
+    m_szPluginsDirPath[sizeof(m_szPluginsDirPath)-1] = 0;
+    std::string configIniFile = std::string(m_szPluginsDirPath) + "milkdrop.ini";
+    strncpy(m_szConfigIniFile, configIniFile.c_str(), sizeof(m_szConfigIniFile) - 1);
+    m_szConfigIniFile[sizeof(m_szConfigIniFile)-1] = 0;
+	strncpy(m_szConfigIniFileA, m_szConfigIniFile, sizeof(m_szConfigIniFileA) - 1);
+    m_szConfigIniFileA[sizeof(m_szConfigIniFileA)-1] = 0;
 
 	m_lost_focus = 0;
 	m_hidden     = 0;
